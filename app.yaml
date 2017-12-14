@@ -1,0 +1,39 @@
+# 言語
+runtime: python27
+# APIバージョン
+api_version: 1
+# マルチスレッド
+threadsafe: true
+
+# URLと挙動
+handlers:
+# imgフォルダ
+- url: /img
+  static_files: img
+  upload: /img
+- url: /img
+  static_dir: img
+# jsフォルダ
+- url: /js
+  static_files: js
+  upload: /js
+- url: /js
+  static_dir: js
+# cssフォルダ
+- url: /css
+  static_files: css
+  upload: /css
+- url: /css
+  static_dir: css
+# /~の場合 main.appを実行
+- url: /.*
+  script: main.app
+
+# 使用するライブラリとバージョン
+libraries:
+# jinja2テンプレートエンジン
+- name: jinja2
+  version: latest
+# Google App Engine API
+- name: webapp2
+  version: latest

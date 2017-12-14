@@ -1,0 +1,43 @@
+<!doctype html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>graph</title>
+    <link rel="stylesheet" type="text/css" href="./css/main.css">
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+</head>
+
+<body>
+    <!-- ライブラリ読み込み -->
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="./js/graph.js"></script>
+
+    <!-- 日付指定部 -->
+    <script>
+        $(function () {
+            $.datepicker.setDefaults($.datepicker.regional["ja"]);
+            $("#daytxt").datepicker();
+        });
+    </script>
+    <div id='form'>日付:<input type="text" id="daytxt" />
+    </div>
+
+    <!-- グラフ表示部 -->
+    <script type="text/javascript">
+        init_graph([
+            ['時間'{% for header in header %}, '{{header.name}}'{% endfor %}],
+            {%- for value in value %}
+            [new Date({{value.time}}){% for i in range(number) %}, {{value.data[i]}}{% endfor %}],
+            {%- endfor %}
+        ]);
+    </script>
+    <div id="graphField">Now Loading ...</div>
+
+</body>
+
+</html>
