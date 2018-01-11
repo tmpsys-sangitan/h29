@@ -8,75 +8,53 @@
 
 from google.appengine.ext import ndb        # Datastore API
 from google.appengine.api import memcache   # Memcache API
-from datetime import timedelta              # 相対時間型
-
+from datetime import datetime as dt         # datatime型
 import datetime                             # 日時型
 import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
 import webapp2                              # App Engineのフレームワーク
 
-from datetime import Name                   # Nameデータ
-from datetime import Data                   # Dataデータ
+import data                                 # データ管理モジュール
 
 # テンプレートファイルを読み込む環境を作成
-JINJA_ENVIRONMENT = jinja2.Environment( \
+env = jinja2.Environment( \
     loader     = jinja2.FileSystemLoader(os.path.dirname(__file__)), \
     extensions = ['jinja2.ext.autoescape'],autoescape=True)
 
-# Valueクラス宣言
-class Value:
-    def __init__(self, t, d):
-        self.time = t
-        self.data = d
-
-# URLから対応する関数の呼び出し
+# ページの表示
 class BaseHandler(webapp2.RequestHandler):
-    def render(self,html,values={}):
-        template = JINJA_ENVIRONMENT.get_template(html)
-        self.response.write(template.render(values))
+    def render(self,tpl,values={}):
+        tpl_file = env.get_template(tpl)
+        self.response.write(tpl_file.render(values))
 
-# /      トップページ
-class HomePage(BaseHandler):
+# /       メインページ
+class MainPage(BaseHandler):
     # ページ読み込み時処理
     def get(self):
-        self.render('home.html')
+        self.render('top.tpl')
 
-# /graph グラフ表示
-class GraphPage(BaseHandler):
+# /upload アップロードページ
+class UploadPage(BaseHandler):
+    # ページ読み込み時処理
     # ページ読み込み時処理
     def get(self):
-        # Name取得
-        names = Name.get()
+        self.render('upload.tpl')
 
-        # Data取得
-        datas = []
-        for name in names:
-            datas.append(Data.get(name.id, datetime.datetime(2017, 11, 22)))
+    # 送信
+    def post(self):
+        # JSON読み込み
+        daylog = data.Daylog(self.request.get('id'), self.request.get('date'))
 
-        # value作成
-        values = []
-        time = datetime.datetime.combine(datetime.datetime(2017, 11, 22), datetime.time.min)
-        while time < datetime.datetime.combine(datetime.datetime(2017, 11, 22), datetime.time.max):
-            # センサ値集計リスト生成
-            new_data = []
-            for data in datas:
-                try:
-                    new_data.append(next((dv for dv in data if dv.date > time and dv.date < (time + timedelta(minutes=1))),None).val)
-                except:
-                    new_data.append('null')
+        # JSON書き込み
+        daylog.write(self.request.get('date'), self.request.get('fi'), \
+                     self.request.get('bv'), self.request.get('val'), self.request.get('ad'))
 
-            values.append(Value(time.strftime('%Y,%m,%d,%H,%M,0'), new_data))
-            time = time + timedelta(minutes=1)
-
-        outputs = {
-            'header': names,
-            'value': values,
-            'number': len(names)
-        }
-        self.render('graph.html', outputs)
+        # 更新
+        self.redirect('/upload')
 
 # URL - 関数 対応
 app = webapp2.WSGIApplication([
-    ('/',HomePage),
-    ('/graph', GraphPage),
+    ('/',       MainPage),
+    ('/upload', UploadPage)
 ])
+
