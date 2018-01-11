@@ -1,39 +1,53 @@
+#
+# FILE        :app.yaml
+# DATE        :2017.12.20
+# DESCRIPTION :アプリケーション設定
+# NAME        :Hikaru Yoshida
+#
+
 # 言語
 runtime: python27
+
 # APIバージョン
 api_version: 1
+
 # マルチスレッド
 threadsafe: true
 
 # URLと挙動
 handlers:
-# imgフォルダ
-- url: /img
-  static_files: img
-  upload: /img
-- url: /img
-  static_dir: img
-# jsフォルダ
-- url: /js
-  static_files: js
-  upload: /js
-- url: /js
-  static_dir: js
-# cssフォルダ
-- url: /css
-  static_files: css
-  upload: /css
-- url: /css
-  static_dir: css
-# /~の場合 main.appを実行
+
+# favicon.icoの参照とアップロード
+- url: /favicon.ico
+  static_files: img/favicon.ico
+  upload: img/favicon.ico
+
+# img/*.pngの参照とアップロード
+- url: /img/(.*\.png)
+  static_files: img/\1
+  upload: img/(.*\.png)
+
+# js/*.jsの参照とアップロード
+- url: /js/(.*\.js)
+  static_files: js/\1
+  upload: js/(.*\.js)
+
+# css/*.cssの参照とアップロード
+- url: /css/(.*\.css)
+  static_files: css/\1
+  upload: css/(.*\.css)
+
+# その他はmain.appを実行
 - url: /.*
   script: main.app
 
 # 使用するライブラリとバージョン
 libraries:
+
 # jinja2テンプレートエンジン
 - name: jinja2
   version: latest
+
 # Google App Engine API
 - name: webapp2
   version: latest
