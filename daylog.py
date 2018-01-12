@@ -1,8 +1,8 @@
 # coding: UTF-8
 #
-# FILE        :data.py
+# FILE        :daylog.py
 # DATE        :2018.01.10
-# DESCRIPTION :データ管理モジュール
+# DESCRIPTION :日誌管理モジュール
 # NAME        :Hikaru Yoshida
 #
 
@@ -12,7 +12,7 @@ import json                                 # jsonファイル操作
 
 import gcs                                  # GCS操作
 
-class Daylog:
+class daylog:
     """ 日誌クラス
         @id   センサID
         @date 日付
@@ -44,7 +44,7 @@ class Daylog:
         """
 
         # jsonを辞書型に変換
-        dic = json.loads(self.json)
+        dic = json.loads(logjson)
 
         # dateを文字列型→日時型→文字列型に再変換
         date = dt.strptime(date, '%Y%m%d%H%M%S')
@@ -63,31 +63,31 @@ class Daylog:
         dic["datas"].append(newdata)
 
         # 辞書をjsonに
-        self.json = json.dumps(dic)
+        logjson = json.dumps(dic)
 
         # キャッシュ更新
         memcache.delete(self.gen_key())
-        memcache.add(self.gen_key(), self.json)
+        memcache.add(self.gen_key(), logjson)
 
         # GCS更新
-        gcs.write_file(self.gen_key() + ".json", self.json, "application/json")
+        gcs.write_file(self.gen_key() + ".json", logjson, "application/json")
 
     def read(self):
         """ 日誌を読み込む
         """
 
         # キャッシュ問い合わせ
-        self.json = memcache.get(self.gen_key())
-        if self.json is None:
+        logjson = memcache.get(self.gen_key())
+        if logjson is None:
             # ないならGCSから読み込み
             try:
-                self.json = gcs.read_file(self.gen_key() + ".json")
+                logjson = gcs.read_file(self.gen_key() + ".json")
             except:
-                return 0
+                return None
             else:
-                memcache.add(self.gen_key(), self.json)
+                memcache.add(self.gen_key(), logjson)
 
-        return 1
+        return logjson
 
     def new(self):
         """ 日誌を新規作成
@@ -100,7 +100,7 @@ class Daylog:
         }
 
         # 辞書をjsonに
-        self.json = json.dumps(dic)
+        logjson = json.dumps(dic)
 
         # GCS作成
-        gcs.write_file(self.gen_key() + ".json", self.json, "application/json")
+        gcs.write_file(self.gen_key() + ".json", logjson, "application/json")

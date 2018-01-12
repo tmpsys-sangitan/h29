@@ -1,7 +1,7 @@
 {#
-	FILE :top.tpl
+	FILE :main.tpl
 	DATE :2017.12.20
-	DESCRIPTION :トップページテンプレート
+	DESCRIPTION :メインページテンプレート
 	NAME :Hikaru Yoshida
 #}
 
@@ -26,7 +26,7 @@
 {# ページのコンテンツ #}
 {% block content %}
 	<h2>What this?</h2>
-	校内の各教室に設置されたセンサーによって収集された値をグラフやマップにして出力します。
+	産業技術短期大学校の各教室に設置されたセンサーによって収集された値をグラフやマップにして出力します。
 {% endblock %}
 
 {# ページのフッター #}
