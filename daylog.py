@@ -25,7 +25,7 @@ class daylog:
             @date 参照する日付
         """
         self.id = id
-        self.date = dt.strptime(date[0:7], '%Y%m%d')
+        self.date = dt.strptime(date[0:8], '%Y%m%d')
         if self.read() != 1:
             self.new()
 
