@@ -12,9 +12,10 @@ from datetime import datetime as dt         # datatime型
 import datetime                             # 日時型
 import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
+import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
-import data                                 # データ管理モジュール
+from daylog import daylog                   # 日誌管理モジュール
 
 # テンプレートファイルを読み込む環境を作成
 env = jinja2.Environment( \
@@ -23,7 +24,8 @@ env = jinja2.Environment( \
 
 # ページの表示
 class BaseHandler(webapp2.RequestHandler):
-    def render(self,tpl,values={}):
+    def render(self, tpl, values={}):
+        self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
         tpl_file = env.get_template(tpl)
         self.response.write(tpl_file.render(values))
 
@@ -31,11 +33,10 @@ class BaseHandler(webapp2.RequestHandler):
 class MainPage(BaseHandler):
     # ページ読み込み時処理
     def get(self):
-        self.render('top.tpl')
+        self.render('main.tpl')
 
 # /upload アップロードページ
 class UploadPage(BaseHandler):
-    # ページ読み込み時処理
     # ページ読み込み時処理
     def get(self):
         self.render('upload.tpl')
@@ -43,18 +44,37 @@ class UploadPage(BaseHandler):
     # 送信
     def post(self):
         # JSON読み込み
-        daylog = data.Daylog(self.request.get('id'), self.request.get('date'))
+        dl = daylog(self.request.get('id'), self.request.get('date'))
 
         # JSON書き込み
-        daylog.write(self.request.get('date'), self.request.get('fi'), \
-                     self.request.get('bv'), self.request.get('val'), self.request.get('ad'))
+        dl.write(self.request.get('date'), self.request.get('fi'), \
+                 self.request.get('bv'),   self.request.get('val'), self.request.get('ad'))
 
         # 更新
         self.redirect('/upload')
 
+# /get    データ取得
+class DaylogJsonp(BaseHandler):
+    # ページ読み込み時処理
+    def get(self, *args, **kwargs):
+        # JSON読み込み
+        dl = daylog(kwargs['loc'], kwargs['date'])
+
+        # JSONを返却
+        self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+        self.response.out.write(
+            "%s(%s)" %
+            (urllib2.unquote(self.request.get('callback')),
+            dl.read())
+        )
+
+
 # URL - 関数 対応
 app = webapp2.WSGIApplication([
-    ('/',       MainPage),
-    ('/upload', UploadPage)
-])
+    # ページ
+    webapp2.Route('/'      , MainPage),
+    webapp2.Route('/upload', UploadPage),
 
+    # JSON
+    webapp2.Route('/daylog/<loc>/<date>/<type>' , DaylogJsonp),
+])
