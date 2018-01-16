@@ -1,6 +1,6 @@
 # coding: UTF-8
 #
-# FILE        :daylog.py
+# FILE        :diary.py
 # DATE        :2018.01.10
 # DESCRIPTION :日誌管理モジュール
 # NAME        :Hikaru Yoshida
@@ -13,7 +13,7 @@ import logging                              # ログ出力
 
 import gcs                                  # GCS操作
 
-class daylog:
+class diary:
     """ 日誌クラス
         @id   センサID
         @date 日付
