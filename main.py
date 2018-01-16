@@ -15,7 +15,7 @@ import os                                   # OSインターフェイス
 import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
-from daylog import daylog                   # 日誌管理モジュール
+from diary import diary                   # 日誌管理モジュール
 
 # テンプレートファイルを読み込む環境を作成
 env = jinja2.Environment( \
@@ -44,7 +44,7 @@ class UploadPage(BaseHandler):
     # 送信
     def post(self):
         # JSON読み込み
-        dl = daylog(self.request.get('id'), self.request.get('date'), 'W')
+        dl = diary(self.request.get('id'), self.request.get('date'), 'W')
 
         # JSON書き込み
         dl.write(self.request.get('date'), self.request.get('fi'), \
@@ -58,7 +58,7 @@ class DaylogJsonp(BaseHandler):
     # ページ読み込み時処理
     def get(self, *args, **kwargs):
         # JSON読み込み
-        dl = daylog(kwargs['loc'], kwargs['date'], 'R')
+        dl = diary(kwargs['loc'], kwargs['date'], 'R')
 
         # JSONを返却
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
@@ -76,5 +76,5 @@ app = webapp2.WSGIApplication([
     webapp2.Route('/upload', UploadPage),
 
     # JSON
-    webapp2.Route('/daylog/<loc>/<date>/<type>' , DaylogJsonp),
+    webapp2.Route('/diary/<date>/<loc>/<type>' , DaylogJsonp),
 ])
