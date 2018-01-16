@@ -44,7 +44,7 @@ class UploadPage(BaseHandler):
     # 送信
     def post(self):
         # JSON読み込み
-        dl = daylog(self.request.get('id'), self.request.get('date'))
+        dl = daylog(self.request.get('id'), self.request.get('date'), 'W')
 
         # JSON書き込み
         dl.write(self.request.get('date'), self.request.get('fi'), \
@@ -58,7 +58,7 @@ class DaylogJsonp(BaseHandler):
     # ページ読み込み時処理
     def get(self, *args, **kwargs):
         # JSON読み込み
-        dl = daylog(kwargs['loc'], kwargs['date'])
+        dl = daylog(kwargs['loc'], kwargs['date'], 'R')
 
         # JSONを返却
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
