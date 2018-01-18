@@ -1,0 +1,13 @@
+#
+# FILE        :queue.yaml
+# DATE        :2018.01.17
+# DESCRIPTION :アプリケーション設定
+# NAME        :Hikaru Yoshida
+#
+
+# キューの定義
+queue:
+
+# Storage 書き込み リクエスト キュー
+- name: StorageWriteRequestQueue
+  mode: pull

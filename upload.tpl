@@ -14,7 +14,7 @@
 
 <body>
     <form method="post" action="/upload">
-        <input type="text" name="id" />
+        <input type="text" name="devid" />
         <br>
         <input type="text" name="date" />
         <br>

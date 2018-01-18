@@ -9,6 +9,7 @@
 from google.appengine.ext import ndb        # Datastore API
 from google.appengine.api import memcache   # Memcache API
 from datetime import datetime as dt         # datatime型
+import cgi                                  # URLクエリ文の取得
 import datetime                             # 日時型
 import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
@@ -29,11 +30,13 @@ class BaseHandler(webapp2.RequestHandler):
         tpl_file = env.get_template(tpl)
         self.response.write(tpl_file.render(values))
 
+
 # /       メインページ
 class MainPage(BaseHandler):
     # ページ読み込み時処理
     def get(self):
         self.render('main.tpl')
+
 
 # /upload アップロードページ
 class UploadPage(BaseHandler):
@@ -43,22 +46,35 @@ class UploadPage(BaseHandler):
 
     # 送信
     def post(self):
-        # JSON読み込み
-        dl = diary(self.request.get('id'), self.request.get('date'), 'W')
+        # パラメータ読み込み
+        pdic = {
+            # 機器ID
+            "divid": cgi.escape(self.request.get("divid")),
+            # 日時
+            "date" : cgi.escape(self.request.get("date")),
+            # 電波状況
+            "fi" : cgi.escape(self.request.get("fi")),
+            # 電源電圧
+            "bv" : cgi.escape(self.request.get("bv")),
+            # 値
+            "val" : cgi.escape(self.request.get("val")),
+            # A/D値
+            "ad" : cgi.escape(self.request.get("ad"))
+        }
 
-        # JSON書き込み
-        dl.write(self.request.get('date'), self.request.get('fi'), \
-                 self.request.get('bv'),   self.request.get('val'), self.request.get('ad'))
+        # 日誌に追加
+        diary.add(dt.strptime(pdic['date'], '%Y%m%d%H%M%S'), pdic['divid'], pdic['fi'], pdic['bv'], pdic['val'], pdic['ad'])
 
-        # 更新
-        self.redirect('/upload')
 
-# /get    データ取得
-class DaylogJsonp(BaseHandler):
+class DiaryJsonp(BaseHandler):
     # ページ読み込み時処理
-    def get(self, *args, **kwargs):
+    def get(self):
+        # パラメータ読み込み
+        date  = cgi.escape(self.request.get("date"))
+        mapid = cgi.escape(self.request.get("mapid"))
+
         # JSON読み込み
-        dl = diary(kwargs['loc'], kwargs['date'], 'R')
+        dl = diary(date, sensor.get_devid(mapid, temp), 'R')
 
         # JSONを返却
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
@@ -73,8 +89,10 @@ class DaylogJsonp(BaseHandler):
 app = webapp2.WSGIApplication([
     # ページ
     webapp2.Route('/'      , MainPage),
+
+    # アップロード
     webapp2.Route('/upload', UploadPage),
 
     # JSON
-    webapp2.Route('/diary/<date>/<loc>/<type>' , DaylogJsonp),
+    webapp2.Route('/diary' , DiaryJsonp),
 ])
