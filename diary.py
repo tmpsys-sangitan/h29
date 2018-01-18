@@ -15,6 +15,7 @@ import errno
 import os
 
 import gcs                                  # GCS操作
+import utility                              # 汎用関数
 
 class diary:
     """ 日誌クラス
@@ -72,7 +73,6 @@ class diary:
     def new(date, devid):
         """ 日誌を新規作成
         """
-
         # 新規作成するjsonの雛形を作る
         dic = {
             devid : []
@@ -102,10 +102,12 @@ class diary:
         # jsonを辞書型に変換
         dic = json.loads(djson)
 
+        # 日付型を文字列に変換
+        datestr = utility.dt2str(date)
+
         # 新しいデータを辞書型に変換
         newdata = {
-            # 日時 String型→Datatime型→String型で整形
-            "date"  : date.strftime('%Y/%m/%d %H:%M:%S') + " +0900",
+            "date"  : datestr,
             "fi"    : int(fi),
             "bv"    : int(bv),
             "val"   : float(val),
@@ -126,30 +128,34 @@ class diary:
         # Storage更新リクエスト送信
         q = taskqueue.Queue('StorageWriteRequestQueue')
         tasks = []
-        tasks.append(taskqueue.Task(payload=payload, method='PULL', tag=devid))
+        tasks.append(taskqueue.Task(payload=payload, method='PULL', target=devid, tag=datestr))
         q.add(tasks)
 
 
     @staticmethod
-    def write():
+    def write(date):
         """ 日誌への仮追加を確定し、Storageに書き込む
         """
 
         # タスクの取得
         q = taskqueue.Queue('StorageWriteRequestQueue')
-        tasks = q.lease_tasks(60, 100)
+        tasks = q.lease_tasks_by_tag(60, 100, tag=date)
 
         # タスクが空でないなら
-        if tasks is not None:
+        if bool(tasks):
+
             # StorageからJSONを読み込み
-            sjson = gcs.read_file(diary.keystr(date))
+            try:
+                sjson = gcs.read_file(diary.keystr(date))
+            except:
+                raise IOError(errno.ENOENT, os.strerror(errno.ENOENT), diary.keystr(date))
 
             # jsonを辞書に変換
             dic = json.loads(sjson)
 
             # Taskを辞書に反映
             for task in tasks:
-                dic[task.tag].append(json.dumps(task.payload))
+                dic[task.target].append(json.dumps(task.payload))
 
             # 辞書をjsonに変換
             sjson = json.dumps(dic)

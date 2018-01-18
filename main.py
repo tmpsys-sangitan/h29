@@ -9,6 +9,7 @@
 from google.appengine.ext import ndb        # Datastore API
 from google.appengine.api import memcache   # Memcache API
 from datetime import datetime as dt         # datatime型
+from datetime import timedelta as td        # datatime型
 import cgi                                  # URLクエリ文の取得
 import datetime                             # 日時型
 import jinja2                               # ページの描画
@@ -16,7 +17,8 @@ import os                                   # OSインターフェイス
 import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
-from diary import diary                   # 日誌管理モジュール
+from diary import diary                     # 日誌管理モジュール
+import utility                              # 汎用関数
 
 # テンプレートファイルを読み込む環境を作成
 env = jinja2.Environment( \
@@ -39,7 +41,7 @@ class MainPage(BaseHandler):
 
 
 # /upload アップロードページ
-class UploadPage(BaseHandler):
+class PostUpload(BaseHandler):
     # ページ読み込み時処理
     def get(self):
         self.render('upload.tpl')
@@ -62,11 +64,33 @@ class UploadPage(BaseHandler):
             "ad" : cgi.escape(self.request.get("ad"))
         }
 
-        # 日誌に追加
+        # 日誌に仮追加
         diary.add(dt.strptime(pdic['date'], '%Y%m%d%H%M%S'), pdic['divid'], pdic['fi'], pdic['bv'], pdic['val'], pdic['ad'])
 
 
-class DiaryJsonp(BaseHandler):
+# 仮追加を確定し、Storageに書込む
+class PostWrite(BaseHandler):
+    def get(self):
+        # パラメータ読み込み
+        date = utility.str2dt(cgi.escape(self.request.get("date")))
+
+        # パラメータなしなら今日と昨日
+        if date is None:
+            # 日付の取得＆計算
+            today = dt.now()
+            ystd  = today - td(days = 1)
+
+            # 呼び出し
+            diary.write(today)
+            diary.write(ystd)
+
+        # パラメータありなら指定の日付
+        else:
+            diary.write(date)
+            pass
+
+
+class GetDiary(BaseHandler):
     # ページ読み込み時処理
     def get(self):
         # パラメータ読み込み
@@ -90,9 +114,10 @@ app = webapp2.WSGIApplication([
     # ページ
     webapp2.Route('/'      , MainPage),
 
-    # アップロード
-    webapp2.Route('/upload', UploadPage),
+    # POST
+    webapp2.Route('/upload', PostUpload),
+    webapp2.Route('/write' , PostWrite),
 
-    # JSON
-    webapp2.Route('/diary' , DiaryJsonp),
+    # GET
+    webapp2.Route('/diary' , GetDiary),
 ])
