@@ -26,3 +26,12 @@ def dt2str(date):
         return date.strftime('%Y/%m/%d %H:%M:%S') + " +0900"
     except:
         return None
+
+def d2str(date):
+    """ 日時型をyyyymmdd(20180118)に変換する
+        @string 日時文字列
+    """
+    try:
+        return date.strftime('%Y%m%d')
+    except:
+        return None

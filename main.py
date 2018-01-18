@@ -71,23 +71,7 @@ class PostUpload(BaseHandler):
 # 仮追加を確定し、Storageに書込む
 class PostWrite(BaseHandler):
     def get(self):
-        # パラメータ読み込み
-        date = utility.str2dt(cgi.escape(self.request.get("date")))
-
-        # パラメータなしなら今日と昨日
-        if date is None:
-            # 日付の取得＆計算
-            today = dt.now()
-            ystd  = today - td(days = 1)
-
-            # 呼び出し
-            diary.write(today)
-            diary.write(ystd)
-
-        # パラメータありなら指定の日付
-        else:
-            diary.write(date)
-            pass
+        diary.write()
 
 
 class GetDiary(BaseHandler):
