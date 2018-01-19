@@ -25,14 +25,20 @@ class diary:
     def keycache(date, devid):
         """ Memcacheキーの生成
         """
-        return "data_" + utility.d2str(date) + "_" + devid
+        if isinstance(date, dt):
+            return "data_" + utility.d2str(date) + "_" + devid
+        else:
+            return "data_" + date + "_" + devid
 
 
     @staticmethod
     def keystr(date):
         """ Storageキーの生成
         """
-        return "data_" + utility.d2str(date) + ".json"
+        if isinstance(date, dt):
+            return "data_" + utility.d2str(date) + ".json"
+        else:
+            return "data_" + date + ".json"
 
 
     @staticmethod
@@ -146,35 +152,47 @@ class diary:
 
         # タスクが空でないなら
         if bool(tasks):
-            # 作業用辞書を生成
-            sdics = {}
+            # 作業用リストを生成
+            slist_date = []
+            slist_dic = []
 
             # リクエストの消化
             for task in tasks:
+
                 # リクエストを辞書型に変換
-                req = json.loads(task.payload)
+                req = json.loads(task.payload, object_hook=utility.ascii_encode_dict)
 
                 # 辞書からJSONを読み込み
-                if sdics is not req["date"]:
+                if req["date"] is not slist_date:
                     # StorageからJSONを読み込み作業用辞書に追加
                     try:
                         sjson = gcs.read_file(diary.keystr(req["date"]))
-                        sdics[req["date"]] = json.loads(sjson)
+                        sdic = json.loads(sjson, object_hook=utility.ascii_encode_dict)
+                        slist_dic.append(sdic)
+                        slist_date.append(req["date"])
                     except:
-                        logging.warning(os.strerror(errno.ENOENT) + " data_" + req["date"])
-                        continue
+                        slist_dic.append(diary.new(req["date"], req["devid"]))
+                        logging.info("DIARY WRITE : NEW " + task.name)
+                    else:
+                        logging.info("OPEN : " + diary.keystr(req["date"]))
 
                 # 辞書に新しいデータを追加
-                sdics[req["date"]][req["devid"]].append(json.dumps(req["data"]))
+                index = slist_date.index(req["date"])
+                slist_dic[index][req["devid"]].append(req["data"])
 
             # 作業用辞書の変更をStorageにアップロード
-            for sdic in sdics:
-                # 辞書型をJSONに変換
-                sjson = json.dumps(sdic)
+            try:
+                for (date, dic) in zip(slist_date, slist_dic):
+                    # 辞書型をJSONに変換
+                    sjson = json.dumps(dic)
 
-                # Storageにアップロード、成功したらタスクを消去
-                try:
-                    gcs.write_file(diary.keystr(date), sjson, "application/json")
-                    q.delete_tasks(tasks)
-                except:
-                    pass
+                    # Storageにアップロード、成功したらタスクを消去
+                    try:
+                        gcs.write_file(diary.keystr(date), sjson, "application/json")
+                        logging.info("DIARY WRITE : " + diary.keystr(date))
+                    except:
+                        pass
+            except:
+                logging.info(sjson)
+            else:
+                q.delete_tasks(tasks)

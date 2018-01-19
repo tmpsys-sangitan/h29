@@ -35,3 +35,11 @@ def d2str(date):
         return date.strftime('%Y%m%d')
     except:
         return None
+
+def ascii_encode_dict(data):
+    """ jsonがunicodeにcastされないようにする
+        例: json.load(f, object_hook=ascii_encode_dict)
+    """
+    ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
+    return dict(map(ascii_encode, pair) for pair in data.items())
+

@@ -8,10 +8,7 @@
 
 from google.appengine.ext import ndb        # Datastore API
 from google.appengine.api import memcache   # Memcache API
-from datetime import datetime as dt         # datatime型
-from datetime import timedelta as td        # datatime型
 import cgi                                  # URLクエリ文の取得
-import datetime                             # 日時型
 import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
 import urllib2                              # URLを開く
@@ -49,23 +46,15 @@ class PostUpload(BaseHandler):
     # 送信
     def post(self):
         # パラメータ読み込み
-        pdic = {
-            # 機器ID
-            "divid": cgi.escape(self.request.get("divid")),
-            # 日時
-            "date" : cgi.escape(self.request.get("date")),
-            # 電波状況
-            "fi" : cgi.escape(self.request.get("fi")),
-            # 電源電圧
-            "bv" : cgi.escape(self.request.get("bv")),
-            # 値
-            "val" : cgi.escape(self.request.get("val")),
-            # A/D値
-            "ad" : cgi.escape(self.request.get("ad"))
-        }
+        devid = cgi.escape(self.request.get("devid"))
+        date  = cgi.escape(self.request.get("date"))
+        fi    = cgi.escape(self.request.get("fi"))
+        bv    = cgi.escape(self.request.get("bv"))
+        val   = cgi.escape(self.request.get("val"))
+        ad    = cgi.escape(self.request.get("ad"))
 
         # 日誌に仮追加
-        diary.add(dt.strptime(pdic['date'], '%Y%m%d%H%M%S'), pdic['divid'], pdic['fi'], pdic['bv'], pdic['val'], pdic['ad'])
+        diary.add(utility.str2dt(date), devid, fi, bv, val, ad)
 
 
 # 仮追加を確定し、Storageに書込む
@@ -74,15 +63,20 @@ class PostWrite(BaseHandler):
         diary.write()
 
 
+# 日誌データの送信
 class GetDiary(BaseHandler):
     # ページ読み込み時処理
     def get(self):
         # パラメータ読み込み
         date  = cgi.escape(self.request.get("date"))
         mapid = cgi.escape(self.request.get("mapid"))
+        type  = cgi.escape(self.request.get("type"))
+
+        # マップIDを機器IDに変換
+        devid = sensor.get_devid(mapid, type)
 
         # JSON読み込み
-        dl = diary(date, sensor.get_devid(mapid, temp), 'R')
+        dl = diary(date, devid, 'R')
 
         # JSONを返却
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
