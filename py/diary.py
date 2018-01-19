@@ -14,8 +14,9 @@ import logging                              # ログ出力
 import errno
 import os
 
-import gcs                                  # GCS操作
-import utility                              # 汎用関数
+from py import gcs                               # GCS操作
+from py import sensor                            # センサ管理
+from py import utility                           # 汎用関数
 
 class diary:
     """ 日誌クラス
@@ -68,7 +69,7 @@ class diary:
         sjson = gcs.read_file(diary.keystr(date))
 
         # jsonを辞書に変換
-        dic = json.loads(sjson)
+        dic = utility.load_json(sjson)
 
         # jsonを分解し、Memcacheへ保存
         for devid in sensor.get_slist("temp"):
@@ -108,15 +109,22 @@ class diary:
             djson = diary.new(date, devid)
 
         # jsonを辞書型に変換
-        dic = json.loads(djson)
+        dic = utility.load_json(djson)
+
+        # データの重複チェック
+        timekey = utility.t2str(date)
+        if timekey in dic[devid]:
+            # 重複エラーで終了
+            return
 
         # 新しいデータを辞書型に変換
         newdata = {
-            "date"  : utility.dt2str(date),
-            "fi"    : int(fi),
-            "bv"    : int(bv),
-            "val"   : float(val),
-            "ad"    : int(ad)
+            utility.t2str(date): {
+                "fi"    : int(fi),
+                "bv"    : int(bv),
+                "val"   : float(val),
+                "ad"    : int(ad)
+            }
         }
 
         # 新しいデータを辞書に追加してjsonに変換
@@ -160,14 +168,14 @@ class diary:
             for task in tasks:
 
                 # リクエストを辞書型に変換
-                req = json.loads(task.payload, object_hook=utility.ascii_encode_dict)
+                req = utility.load_json(task.payload)
 
                 # 辞書からJSONを読み込み
                 if req["date"] is not slist_date:
                     # StorageからJSONを読み込み作業用辞書に追加
                     try:
                         sjson = gcs.read_file(diary.keystr(req["date"]))
-                        sdic = json.loads(sjson, object_hook=utility.ascii_encode_dict)
+                        sdic = utility.load_json(sjson)
                         slist_dic.append(sdic)
                         slist_date.append(req["date"])
                     except:

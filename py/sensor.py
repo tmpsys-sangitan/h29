@@ -2,7 +2,7 @@
 #
 # FILE        :sensor.py
 # DATE        :2018.01.17
-# DESCRIPTION :センサーモジュール
+# DESCRIPTION :センサ管理
 # NAME        :Hikaru Yoshida
 #
 
@@ -56,7 +56,7 @@ class sensor(ndb.Model):
         # 辞書からmapidに対応するdevidを取り出し
         try:
             devid = sdic[mapid]
-        except
+        except:
             devid = None
 
         return devid

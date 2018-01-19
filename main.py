@@ -14,8 +14,8 @@ import os                                   # OSインターフェイス
 import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
-from diary import diary                     # 日誌管理モジュール
-import utility                              # 汎用関数
+from py.diary import diary                  # 日誌管理モジュール
+from py import utility                      # 汎用関数
 
 # テンプレートファイルを読み込む環境を作成
 env = jinja2.Environment( \
@@ -34,14 +34,14 @@ class BaseHandler(webapp2.RequestHandler):
 class MainPage(BaseHandler):
     # ページ読み込み時処理
     def get(self):
-        self.render('main.tpl')
+        self.render('tpl/main.tpl')
 
 
 # /upload アップロードページ
 class PostUpload(BaseHandler):
     # ページ読み込み時処理
     def get(self):
-        self.render('upload.tpl')
+        self.render('tpl/upload.tpl')
 
     # 送信
     def post(self):
@@ -72,7 +72,7 @@ class GetDiary(BaseHandler):
         mapid = cgi.escape(self.request.get("mapid"))
         type  = cgi.escape(self.request.get("type"))
 
-        # マップIDを機器IDに変換
+        # マップIDを機器IDに変換a
         devid = sensor.get_devid(mapid, type)
 
         # JSON読み込み

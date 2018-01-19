@@ -7,6 +7,7 @@
 #
 
 from datetime import datetime as dt         # datatime型
+import json                                 # jsonファイル操作
 
 def str2dt(string):
     """ yyyymmddHHMMSS(20180118113940)を日時型に変換する
@@ -36,10 +37,22 @@ def d2str(date):
     except:
         return None
 
+def t2str(date):
+    """ 日時型をHHMM(1139)に変換する
+        @string 日時文字列
+    """
+    try:
+        return date.strftime('%H%M')
+    except:
+        return None
+
 def ascii_encode_dict(data):
     """ jsonがunicodeにcastされないようにする
         例: json.load(f, object_hook=ascii_encode_dict)
     """
     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
     return dict(map(ascii_encode, pair) for pair in data.items())
+
+def load_json(jsondata):
+    return json.loads(jsondata, object_hook=ascii_encode_dict)
 
