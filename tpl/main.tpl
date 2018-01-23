@@ -6,7 +6,7 @@
 #}
 
 {# ベーステンプレートを継承 #}
-{% extends "base.tpl" %}
+{% extends "tpl/base.tpl" %}
 
 {# <title></title>内の記述 #}
 {% block title %}

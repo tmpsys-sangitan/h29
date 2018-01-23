@@ -1,0 +1,21 @@
+#
+# FILE        :cron.yaml
+# DATE        :2018.01.18
+# DESCRIPTION :アプリケーション設定
+# NAME        :Hikaru Yoshida
+#
+
+# cronの定義
+cron:
+
+# ストレージへの書き込み
+- description: storage_write
+
+  # 指定のURLを実行
+  url: /write
+
+  # 1分周期で実行
+  schedule: every 1 minutes
+
+  # 日本時間で実行
+  timezone: Asia/Tokyo

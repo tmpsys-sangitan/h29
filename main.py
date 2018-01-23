@@ -8,14 +8,16 @@
 
 from google.appengine.ext import ndb        # Datastore API
 from google.appengine.api import memcache   # Memcache API
-from datetime import datetime as dt         # datatime型
-import datetime                             # 日時型
+import cgi                                  # URLクエリ文の取得
 import jinja2                               # ページの描画
+import logging                              # ログ出力
 import os                                   # OSインターフェイス
 import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
-from diary import diary                   # 日誌管理モジュール
+from py import diary                        # 日誌管理モジュール
+from py import sensor                       # センサ管理
+from py import utility                      # 汎用関数
 
 # テンプレートファイルを読み込む環境を作成
 env = jinja2.Environment( \
@@ -29,43 +31,63 @@ class BaseHandler(webapp2.RequestHandler):
         tpl_file = env.get_template(tpl)
         self.response.write(tpl_file.render(values))
 
+
 # /       メインページ
 class MainPage(BaseHandler):
     # ページ読み込み時処理
     def get(self):
-        self.render('main.tpl')
+        self.render('tpl/main.tpl')
+
 
 # /upload アップロードページ
-class UploadPage(BaseHandler):
+class PostUpload(BaseHandler):
     # ページ読み込み時処理
     def get(self):
-        self.render('upload.tpl')
+        self.render('tpl/upload.tpl')
 
     # 送信
     def post(self):
-        # JSON読み込み
-        dl = diary(self.request.get('id'), self.request.get('date'), 'W')
+        # パラメータ読み込み
+        devid = cgi.escape(self.request.get("devid"))
+        date  = cgi.escape(self.request.get("date"))
+        fi    = cgi.escape(self.request.get("fi"))
+        bv    = cgi.escape(self.request.get("bv"))
+        val   = cgi.escape(self.request.get("val"))
+        ad    = cgi.escape(self.request.get("ad"))
 
-        # JSON書き込み
-        dl.write(self.request.get('date'), self.request.get('fi'), \
-                 self.request.get('bv'),   self.request.get('val'), self.request.get('ad'))
+        # 日誌に仮追加
+        diary.add(utility.str2dt(date), devid, fi, bv, val, ad)
 
-        # 更新
-        self.redirect('/upload')
 
-# /get    データ取得
-class DaylogJsonp(BaseHandler):
+# 仮追加を確定し、Storageに書込む
+class PostWrite(BaseHandler):
+    def get(self):
+        diary.write()
+
+
+# 日誌データの送信
+class GetDiary(BaseHandler):
     # ページ読み込み時処理
-    def get(self, *args, **kwargs):
-        # JSON読み込み
-        dl = diary(kwargs['loc'], kwargs['date'], 'R')
+    def get(self):
+        # パラメータ読み込み
+        date  = cgi.escape(self.request.get("date"))
+        mapid = cgi.escape(self.request.get("mapid"))
+        type  = cgi.escape(self.request.get("type"))
+
+        # マップIDを機器IDに変換
+        devid = sensor.get_devid(mapid, type)
+
+        # Nullチェック
+        if devid is None:
+            logging.info("MAIN GETDIARY : DEVID IS NONE")
+            return
 
         # JSONを返却
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
         self.response.out.write(
             "%s(%s)" %
             (urllib2.unquote(self.request.get('callback')),
-            dl.read())
+            diary.read(date, devid))
         )
 
 
@@ -73,8 +95,11 @@ class DaylogJsonp(BaseHandler):
 app = webapp2.WSGIApplication([
     # ページ
     webapp2.Route('/'      , MainPage),
-    webapp2.Route('/upload', UploadPage),
 
-    # JSON
-    webapp2.Route('/diary/<date>/<loc>/<type>' , DaylogJsonp),
+    # POST
+    webapp2.Route('/upload', PostUpload),
+    webapp2.Route('/write' , PostWrite),
+
+    # GET
+    webapp2.Route('/diary' , GetDiary),
 ])
