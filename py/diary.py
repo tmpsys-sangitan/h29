@@ -1,6 +1,6 @@
 # coding: UTF-8
 #
-# FILE        :py
+# FILE        :diary.py
 # DATE        :2018.01.17
 # DESCRIPTION :日誌管理モジュール
 # NAME        :Hikaru Yoshida
