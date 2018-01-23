@@ -10,11 +10,13 @@ from google.appengine.ext import ndb        # Datastore API
 from google.appengine.api import memcache   # Memcache API
 import cgi                                  # URLクエリ文の取得
 import jinja2                               # ページの描画
+import logging                              # ログ出力
 import os                                   # OSインターフェイス
 import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
-from py.diary import diary                  # 日誌管理モジュール
+from py import diary                        # 日誌管理モジュール
+from py import sensor                       # センサ管理
 from py import utility                      # 汎用関数
 
 # テンプレートファイルを読み込む環境を作成
@@ -72,18 +74,20 @@ class GetDiary(BaseHandler):
         mapid = cgi.escape(self.request.get("mapid"))
         type  = cgi.escape(self.request.get("type"))
 
-        # マップIDを機器IDに変換a
+        # マップIDを機器IDに変換
         devid = sensor.get_devid(mapid, type)
 
-        # JSON読み込み
-        dl = diary(date, devid, 'R')
+        # Nullチェック
+        if devid is None:
+            logging.info("MAIN GETDIARY : DEVID IS NONE")
+            return
 
         # JSONを返却
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
         self.response.out.write(
             "%s(%s)" %
             (urllib2.unquote(self.request.get('callback')),
-            dl.read())
+            diary.read(date, devid))
         )
 
 

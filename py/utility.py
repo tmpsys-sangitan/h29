@@ -54,5 +54,11 @@ def ascii_encode_dict(data):
     return dict(map(ascii_encode, pair) for pair in data.items())
 
 def load_json(jsondata):
+    """ JSONの読み込み
+    """
     return json.loads(jsondata, object_hook=ascii_encode_dict)
 
+def dump_json(dicdata):
+    """ JSONの出力
+    """
+    return json.dumps(dicdata, sort_keys=True)
