@@ -21,10 +21,9 @@ function read_diary(date, mapid, type, jd) {
 
     // 読み込み
     $.ajax({
-        ajax: false,
         cache: cachemode,
         dataType: 'jsonp',
-        jsonpCallback: 'callback',
+        jsonpCallback: 'callback_' + mapid,
         type: 'GET',
         url  : url,
         data : {
@@ -33,7 +32,6 @@ function read_diary(date, mapid, type, jd) {
             'type' : type
         }
     }).done(function(json, type){
-        console.log(jd.json);
         // JSONを元にjdを書き換え
         var end_date = new Date(date);
         end_date.setDate(end_date.getDate() + 1);

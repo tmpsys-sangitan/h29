@@ -36,9 +36,10 @@ class Jsondata {
         };
 
         // ヘッターの設定
-        this.header_list = [];
-        for (var i = 0; i < label.length; i++) {
-            this.add_header(label[i], mapid[i]);
+        this.label_list = label.concat();
+        this.mapid_list = mapid.concat();
+        for (var i = 0; i < label_list.length; i++) {
+            this.add_header(label_list[i], mapid_list[i]);
         }
 
         // 空データの設定
@@ -49,7 +50,11 @@ class Jsondata {
         }
 
         // データの設定
-        read_diary(new Date("2017/11/22 00:00:00 +0900"), "test16", "temp", this)
+        var date = new Date("2017/11/22 00:00:00 +0900")
+        for (var i = 0; i < mapid_list.length; i++) {
+            read_diary(date, mapid_list[i], "temp", this)
+        }
+
 
     }
 
@@ -65,7 +70,6 @@ class Jsondata {
             'type': "number"
         };
         this.json.cols.push(new_herder);
-        this.header_list.push(mapid);
     }
 
     /*
@@ -80,14 +84,11 @@ class Jsondata {
             ]
         };
 
-        // 空データに追加するオブジェクトの作成
-        var new_none = {
-            'v': 0
-        };
-
         // 空データにヘッタの数だけNoneを追加
-        for (var i = 0; i < this.header_list.length; i++) {
-            new_data.c.push(new_none);
+        for (var i = 0; i < this.label_list.length; i++) {
+            new_data.c.push({
+                'v': null
+            });
         }
         this.json.rows.push(new_data);
 
@@ -102,10 +103,9 @@ class Jsondata {
         var newLines = this.json.rows.filter(function(item, index){
             if ((item.c[0].v).indexOf(formatDate(date, "Date(YYYY, MM, DD, hh, mm, ss)")) >= 0) return true;
         });
-        console.log(newLines[0]);
 
         // 対応するセンサの検索
-        var idx = this.header_list.indexOf(mapid) + 1
+        var idx = this.mapid_list.indexOf(mapid) + 1
 
         // 書き換え
         newLines[0].c[idx].v = val;
