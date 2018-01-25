@@ -23,10 +23,6 @@ $RECYCLE.BIN/
 
 # Visual Studio Code setting file
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
 
 # Python Compile file
 *.pyc
