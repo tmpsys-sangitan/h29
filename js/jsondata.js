@@ -51,11 +51,18 @@ class Jsondata {
 
         // データの設定
         var date = new Date("2017/11/22 00:00:00 +0900")
+        var df_array = [];
         for (var i = 0; i < mapid_list.length; i++) {
-            read_diary(date, mapid_list[i], "temp", this)
+            df_array.push(read_diary(date, mapid_list[i], "temp", this));
         }
 
-
+        // データ受信完了待ち
+        $.when.apply(null, df_array).then(function () {
+            console.log("data done");
+            // グラフの描画
+            j.draw()
+            console.log("complete");
+        })
     }
 
     /*
@@ -100,7 +107,7 @@ class Jsondata {
     add_data(date, mapid, val) {
 
         // 対応する時間軸の検索
-        var newLines = this.json.rows.filter(function(item, index){
+        var newLines = this.json.rows.filter(function (item, index) {
             if ((item.c[0].v).indexOf(formatDate(date, "Date(YYYY, MM, DD, hh, mm, ss)")) >= 0) return true;
         });
 

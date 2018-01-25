@@ -31,18 +31,17 @@ function read_diary(date, mapid, type, jd) {
             'mapid': mapid,
             'type' : type
         }
-    }).done(function(json, type){
+    }).done(function(json){
+        console.log(type + " done");
+
         // JSONを元にjdを書き換え
         var end_date = new Date(date);
         end_date.setDate(end_date.getDate() + 1);
         for (var d = new Date(date); d < end_date; d.setMinutes(d.getMinutes() + 1)) {
             var val = json[formatDate(d, "hhmm")].val;
-
             jd.add_data(d, mapid, val);
         }
-
-        // グラフの再描画
-        j.draw();
+        console.log(mapid + " resolve");
 
         // プロミスを更新
         df.resolve();
