@@ -35,16 +35,19 @@ def get_list(type):
     """
     # キャッシュからリストの取得
     sensor_json = memcache.get("sensor_" + type)
+
+    # キャッシュ ミス
     if sensor_json is None:
         # データストアからリストの取得
         sensor_keys = sensor.query(sensor.type == type).fetch(keys_only=True)
 
         # 辞書の生成
         sensor_list = []
+        append=sensor_list.append   # 参照を事前に読み込むことで高速化
         for skey in sensor_keys:
 
             # 辞書に追加
-            sensor_list.append({
+            append({
                 "mapid" : skey.string_id().split("_")[0],
                 "devid" : skey.string_id().split("_")[1],
                 "label" : skey.string_id().split("_")[2]
@@ -54,6 +57,7 @@ def get_list(type):
         memcache.add("sensor_" + type, utility.dump_json(sensor_list))
         logging.debug("SENSOR GET_LIST : READ FROM CLOUD STORAGE")
 
+    # キャッシュ ヒット
     else:
         # JSONを読み込み
         sensor_list = utility.load_json(sensor_json)
