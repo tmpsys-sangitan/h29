@@ -6,8 +6,12 @@
 # NAME        :Hikaru Yoshida
 #
 
-from py import sensor   # センサ管理
-from py import utility  # 汎用関数
+from datetime import datetime as dt # datatime型
+from datetime import timedelta      # 相対時間型
+import datetime # datatime
+
+from py import sensor               # センサ管理
+from py import utility              # 汎用関数
 
 
 
@@ -21,7 +25,7 @@ def gen_dayly(sensors=None):
     # JSONの生成
     graph_json = {
         "cols": gen_cols(sensor.get_list_label("temp")),
-        "rows": gen_rows()
+        "rows": gen_rows(utility.str2dt("20171122000000"))
     }
 
     # 出力
@@ -73,11 +77,11 @@ def gen_rows(date, sensors=None):
     # 横軸の入力
     time = dt.combine(date, datetime.time.min)
     while time < dt.combine(date, datetime.time.max):
-        rows_append{
+        rows_append({
             'c': [
                 { 'v': utility.dt2date(time) }
             ]
-        }
+        })
         time = time + timedelta(minutes=1)
 
     # 生成したボディを返す
