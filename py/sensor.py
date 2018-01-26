@@ -67,7 +67,6 @@ def get_list_devid(type):
     """指定された種類の機器IDのリストを返す
 
     Arguments:
-        mapid {string} -- マップID
         type  {string} -- 種類
 
     Returns:
@@ -78,6 +77,22 @@ def get_list_devid(type):
 
     # リストの検索
     results = [x['devid'] for x in sensor_list]
+
+    return results
+
+
+
+def get_list_label():
+    """表示名のリストを返す
+
+    Returns:
+        string -- 表示名のリスト
+    """
+    # センサID辞書の取得
+    sensor_list = get_list(type)
+
+    # リストの検索
+    results = [x['label'] for x in sensor_list]
 
     return results
 
