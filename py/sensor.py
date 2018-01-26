@@ -45,8 +45,8 @@ def get_list(type):
 
             # 辞書に追加
             sensor_list.append({
-                "mapid" : skey.string_id().split("_")[0]
-                "devid" : skey.string_id().split("_")[1]
+                "mapid" : skey.string_id().split("_")[0],
+                "devid" : skey.string_id().split("_")[1],
                 "label" : skey.string_id().split("_")[2]
             })
 
@@ -82,7 +82,7 @@ def get_list_devid(type):
 
 
 
-def get_list_label():
+def get_list_label(type):
     """表示名のリストを返す
 
     Returns:

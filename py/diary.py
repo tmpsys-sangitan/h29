@@ -14,9 +14,9 @@ import json                                 # jsonファイル操作
 import logging                              # ログ出力
 import os
 
-from py import gcs                               # GCS操作
-from py import sensor                            # センサ管理
-from py import utility                           # 汎用関数
+from py import gcs                          # GCS操作
+from py import sensor                       # センサ管理
+from py import utility                      # 汎用関数
 
 
 
