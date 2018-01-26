@@ -49,18 +49,17 @@ def gen_cols(labels):
     # sensorsのデータを追加
     append=cols.append  # 参照を事前に読み込むことで高速化
     for label in labels:
-        new_cols = {
+        append({
             'label': label,
             'type': "number"
-        }
-        append(new_cols)
+        })
 
     # 生成したヘッタを返す
     return cols
 
 
 
-def gen_rows():
+def gen_rows(date, sensors=None):
     """グラフを描画するJSONの1日分のボディを生成する
 
     Arguments:
@@ -68,6 +67,18 @@ def gen_rows():
     Returns:
         dicstionary list -- 1日分のボディ部分の辞書リスト
     """
+    rows = []
+    rows_append=rows.append  # 参照を事前に読み込むことで高速化
+
+    # 横軸の入力
+    time = dt.combine(date, datetime.time.min)
+    while time < dt.combine(date, datetime.time.max):
+        rows_append{
+            'c': [
+                { 'v': utility.dt2date(time) }
+            ]
+        }
+        time = time + timedelta(minutes=1)
 
     # 生成したボディを返す
     return None
