@@ -6,12 +6,12 @@
 # NAME        :Hikaru Yoshida
 #
 
-from google.appengine.api import taskqueue  # TaskQueue API
-from google.appengine.api import memcache   # Memcache API
 from datetime import datetime as dt         # datatime型
+from google.appengine.api import memcache   # Memcache API
+from google.appengine.api import taskqueue  # TaskQueue API
+import errno
 import json                                 # jsonファイル操作
 import logging                              # ログ出力
-import errno
 import os
 
 from py import gcs                               # GCS操作
@@ -65,13 +65,13 @@ def cache(date):
     """
 
     # StorageからJSONを読み込み
-    sjson = gcs.read_file(keystr(date))
+    str_json = gcs.read_file(keystr(date))
 
     # jsonを辞書に変換
-    dic = utility.load_json(sjson)
+    dic = utility.load_json(str_json)
 
     # jsonを分解し、Memcacheへ保存
-    for devid in sensor.get_sdic("temp").values():
+    for devid in get_list_devid("temp"):
         if devid in dic:
             memcache.add(keycache(date, devid), utility.dump_json(dic[devid]))
         else:
@@ -183,9 +183,9 @@ def write():
             if date not in slist_date:
                 # StorageからJSONを読み込み作業用辞書に追加
                 try:
-                    sjson = gcs.read_file(keystr(date))
-                    sdic = utility.load_json(sjson)
-                    slist_dic.append(sdic)
+                    str_json = gcs.read_file(keystr(date))
+                    str_dic = utility.load_json(str_json)
+                    slist_dic.append(str_dic)
                     slist_date.append(date)
                 except:
                     slist_dic.append(new(date, devid))
@@ -207,15 +207,15 @@ def write():
         try:
             for (date, dic) in zip(slist_date, slist_dic):
                 # 辞書型をJSONに変換
-                sjson = utility.dump_json(dic)
+                str_json = utility.dump_json(dic)
 
                 # Storageにアップロード、成功したらタスクを消去
                 try:
-                    gcs.write_file(keystr(date), sjson, "application/json")
+                    gcs.write_file(keystr(date), str_json, "application/json")
                     logging.info("DIARY WRITE : " + keystr(date))
                 except:
                     pass
         except:
-            logging.info(sjson)
+            logging.info(str_json)
         else:
             q.delete_tasks(tasks)

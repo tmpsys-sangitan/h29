@@ -12,6 +12,8 @@ import logging                              # ログ出力
 
 from py import utility                      # 汎用関数
 
+
+
 # Datastoreでの種類とプロパティ定義
 class sensor(ndb.Model):
     """ データストア：種類センサのデータ
@@ -19,6 +21,8 @@ class sensor(ndb.Model):
 
     # センサ種類
     type = ndb.StringProperty()
+
+
 
 def get_list(type):
     """ 指定された種類のセンサのリストを返す
