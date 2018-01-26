@@ -60,7 +60,7 @@ def get_list(type):
     # キャッシュ ヒット
     else:
         # JSONを読み込み
-        sensor_list = utility.load_json(sensor_json)
+        sensor_list = utility.load_json(sensor_json, charset="ascii")
         logging.debug("SENSOR GET_LIST : READ FROM MEMCACHE")
 
     return sensor_list

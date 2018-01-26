@@ -15,16 +15,16 @@ def str2dt(string):
     """
     try:
         return dt.strptime(string, '%Y%m%d%H%M%S')
-    except:
+    except ValueError:
         return None
 
-def dt2date(string):
-    """ yyyymmddHHMMSS(20180118113940)を日時型に変換する
+def dt2date(date):
+    """ 日時型をDate(yyyy, mm, dd, HH, MM, SS)に変換する
         @string 日時文字列
     """
     try:
-        return dt.strptime(string, 'Date(%Y, %m, %d, %H, %M, %S)')
-    except:
+        return date.strftime('Date(%Y, %m, %d, %H, %M, %S)')
+    except ValueError:
         return None
 
 def dt2str(date):
@@ -34,7 +34,7 @@ def dt2str(date):
     """
     try:
         return date.strftime('%Y/%m/%d %H:%M:%S') + " +0900"
-    except:
+    except ValueError:
         return None
 
 def d2str(date):
@@ -43,7 +43,7 @@ def d2str(date):
     """
     try:
         return date.strftime('%Y%m%d')
-    except:
+    except ValueError:
         return None
 
 def t2str(date):
@@ -52,7 +52,7 @@ def t2str(date):
     """
     try:
         return date.strftime('%H%M')
-    except:
+    except ValueError:
         return None
 
 def ascii_encode_dict(data):
@@ -62,12 +62,15 @@ def ascii_encode_dict(data):
     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
     return dict(map(ascii_encode, pair) for pair in data.items())
 
-def load_json(jsondata):
+def load_json(jsondata, charset="unicode"):
     """ JSONの読み込み
     """
-    return json.loads(jsondata, object_hook=ascii_encode_dict)
+    if charset == "unicode":
+        return json.loads(jsondata, object_hook=ascii_encode_dict)
+    else:
+        return json.loads(jsondata)
 
 def dump_json(dicdata):
     """ JSONの出力
     """
-    return json.dumps(dicdata, sort_keys=True)
+    return json.dumps(dicdata, sort_keys=True, ensure_ascii=False)

@@ -85,4 +85,4 @@ def gen_rows(date, sensors=None):
         time = time + timedelta(minutes=1)
 
     # 生成したボディを返す
-    return None
+    return rows
