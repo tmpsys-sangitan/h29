@@ -14,108 +14,68 @@ var formatDate = function (date, format) {
     return format;
 };
 
+var _jsondata;
+
 /*
  * データテーブル用JSON管理クラス
  */
-class Jsondata {
-    /*
-     * コンストラクタ
-     * JSONの雛形作成
-     */
-    constructor(label, mapid, startdate, period) {
+function gen_jsondata(label, mapid, startdate, period) {
 
-        // JSONの宣言
-        this.json = {
-            'cols': [
-                {
-                    'label': "日時",
-                    'type': "datetime"
-                }
-            ],
-            'rows': []
-        };
+    // JSONの宣言
+    this.json = JSON.stringify();
 
-        // ヘッターの設定
-        this.label_list = label.concat();
-        this.mapid_list = mapid.concat();
-        for (var i = 0; i < label_list.length; i++) {
-            this.add_header(label_list[i], mapid_list[i]);
-        }
+    // データ受信完了待ち
+    $.when(
+        this.get_diary(new Date(startdate))
+    ).then(function () {
+        console.log("data done");
+        console.log(_jsondata);
+        // グラフの描画
+        j.draw()
+        console.log("complete");
+    })
+}
 
-        // 空データの設定
-        var end_date = new Date(startdate);
-        end_date.setDate(end_date.getDate() + 1);
-        for (var d = new Date(startdate); d < end_date; d.setMinutes(d.getMinutes() + 1)) {
-            this.add_nonedata(d);
-        }
+/*
+ * 日誌の読み込み
+ * @date Datatime型 日付
+ */
+function get_diary(date, jd) {
+    // ディファードの宣言
+    var df = new $.Deferred();
 
-        // データの設定
-        var date = new Date("2017/11/22 00:00:00 +0900")
-        var df_array = [];
-        for (var i = 0; i < mapid_list.length; i++) {
-            df_array.push(read_diary(date, mapid_list[i], "temp", this));
-        }
+    // URL生成
+    var url = 'http://tmpsys-sangitan.appspot.com/diary';
 
-        // データ受信完了待ち
-        $.when.apply(null, df_array).then(function () {
-            console.log("data done");
-            // グラフの描画
-            j.draw()
-            console.log("complete");
-        })
+    // 日付が今日ならキャッシュしない
+    var cachemode = true;
+    var today = new Date();
+    if (date.getFullYear() == today.getFullYear()
+        && date.getMonth() == today.getMonth()
+        && date.getDate() == today.getDate()) {
+
+        cachemode = false;
     }
 
-    /*
-     * ヘッターの追加
-     */
-    add_header(labels, mapid) {
-
-        // ヘッターに追加するオブジェクトの作成
-        var new_herder = {
-            'id': mapid,
-            'label': labels,
-            'type': "number"
-        };
-        this.json.cols.push(new_herder);
-    }
-
-    /*
-     * 空データの追加
-     */
-    add_nonedata(date) {
-
-        // ボディに追加する空データの作成
-        var new_data = {
-            'c': [
-                { 'v': formatDate(date, "Date(YYYY, MM, DD, hh, mm, ss)") }
-            ]
-        };
-
-        // 空データにヘッタの数だけNoneを追加
-        for (var i = 0; i < this.label_list.length; i++) {
-            new_data.c.push({
-                'v': null
-            });
+    // 読み込み
+    $.ajax({
+        cache: cachemode,
+        dataType: 'jsonp',
+        jsonpCallback: 'callback',
+        type: 'GET',
+        url: url,
+        data: {
+            'date': formatDate(date, "YYYYMMDD000000")
         }
-        this.json.rows.push(new_data);
+    }).done(function (json) {
+        // JSONを格納
+        _jsondata = json;
+        console.log(_jsondata);
 
-    }
+        // プロミスを更新
+        df.resolve();
+    });
 
-    /*
-     * データの置き換え
-     */
-    add_data(date, mapid, val) {
-
-        // 対応する時間軸の検索
-        var newLines = this.json.rows.filter(function (item, index) {
-            if ((item.c[0].v).indexOf(formatDate(date, "Date(YYYY, MM, DD, hh, mm, ss)")) >= 0) return true;
-        });
-
-        // 対応するセンサの検索
-        var idx = this.mapid_list.indexOf(mapid) + 1
-
-        // 書き換え
-        newLines[0].c[idx].v = val;
-
-    }
+    // プロミスを返す
+    return df.promise();
 }

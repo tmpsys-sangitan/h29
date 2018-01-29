@@ -6,17 +6,14 @@
 # NAME        :Hikaru Yoshida
 #
 
-from google.appengine.api import taskqueue  # TaskQueue API
-from google.appengine.api import memcache   # Memcache API
 from datetime import datetime as dt         # datatime型
-import json                                 # jsonファイル操作
+from google.appengine.api import memcache   # Memcache API
+from google.appengine.api import taskqueue  # TaskQueue API
 import logging                              # ログ出力
-import errno
-import os
 
-from py import gcs                               # GCS操作
-from py import sensor                            # センサ管理
-from py import utility                           # 汎用関数
+from py import gcs                          # GCS操作
+from py import sensor                       # センサ管理
+from py import utility                      # 汎用関数
 
 
 
@@ -65,18 +62,18 @@ def cache(date):
     """
 
     # StorageからJSONを読み込み
-    sjson = gcs.read_file(keystr(date))
+    str_json = gcs.read_file(keystr(date))
 
     # jsonを辞書に変換
-    dic = utility.load_json(sjson)
+    dic = utility.load_json(str_json)
 
     # jsonを分解し、Memcacheへ保存
-    for devid in sensor.get_sdic("temp").values():
+    for devid in sensor.get_list_devid("temp"):
         if devid in dic:
             memcache.add(keycache(date, devid), utility.dump_json(dic[devid]))
         else:
             memcache.add(keycache(date, devid), utility.dump_json({devid : {}}))
-        logging.debug("DIARY CACHE : WRITE " + keycache(date, devid))
+        logging.debug("DIARY CACHE : WRITE %s", keycache(date, devid))
 
     return
 
@@ -174,18 +171,18 @@ def write():
             # リクエストから各データ取り出し
             payload = utility.load_json(task.payload)
 
-            date  = payload['date']
+            date = payload['date']
             devid = payload['devid']
-            time  = payload['time']
-            data  = payload['data']
+            time = payload['time']
+            data = payload['data']
 
             # 作業用リストからJSONを読み込み
             if date not in slist_date:
                 # StorageからJSONを読み込み作業用辞書に追加
                 try:
-                    sjson = gcs.read_file(keystr(date))
-                    sdic = utility.load_json(sjson)
-                    slist_dic.append(sdic)
+                    str_json = gcs.read_file(keystr(date))
+                    str_dic = utility.load_json(str_json)
+                    slist_dic.append(str_dic)
                     slist_date.append(date)
                 except:
                     slist_dic.append(new(date, devid))
@@ -207,15 +204,15 @@ def write():
         try:
             for (date, dic) in zip(slist_date, slist_dic):
                 # 辞書型をJSONに変換
-                sjson = utility.dump_json(dic)
+                str_json = utility.dump_json(dic)
 
                 # Storageにアップロード、成功したらタスクを消去
                 try:
-                    gcs.write_file(keystr(date), sjson, "application/json")
+                    gcs.write_file(keystr(date), str_json, "application/json")
                     logging.info("DIARY WRITE : " + keystr(date))
                 except:
                     pass
         except:
-            logging.info(sjson)
+            logging.info(str_json)
         else:
             q.delete_tasks(tasks)

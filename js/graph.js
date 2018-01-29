@@ -12,7 +12,7 @@ class Graph {
     constructor(label, mapid, startdate, period) {
 
         // JSONデータの生成
-        this.jsondata = new Jsondata(label, mapid, startdate, period);
+        gen_jsondata(label, mapid, startdate, period);
 
         // グラフの描画準備
         this.options = {
@@ -52,7 +52,8 @@ class Graph {
      * グラフの再描画
      */
     draw() {
-        var json = JSON.stringify(this.jsondata.json);
+        var json = _jsondata;
+        console.log(_jsondata);
         var datatable = new google.visualization.DataTable(json);
         this.chart.draw(datatable, this.options);
     }

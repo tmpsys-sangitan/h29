@@ -12,6 +12,8 @@ import logging                              # ログ出力
 
 from py import utility                      # 汎用関数
 
+
+
 # Datastoreでの種類とプロパティ定義
 class sensor(ndb.Model):
     """ データストア：種類センサのデータ
@@ -22,50 +24,101 @@ class sensor(ndb.Model):
 
 
 
-def get_sdic(type):
-    """ 指定された種類のセンサをリストアップする
-        @type 種類
+def get_list(type):
+    """ 指定された種類のセンサのリストを返す
+
+    Arguments:
+        type  {string} -- 種類
+
+    Returns:
+        list -- マップID、機器ID、表示名のリスト
     """
     # キャッシュからリストの取得
-    sjson = memcache.get("sensor_" + type)
-    if sjson is None:
+    sensor_json = memcache.get("sensor_" + type)
+
+    # キャッシュ ミス
+    if sensor_json is None:
         # データストアからリストの取得
-        skeys = sensor.query(sensor.type == type).fetch(keys_only=True)
+        sensor_keys = sensor.query(sensor.type == type).fetch(keys_only=True)
 
         # 辞書の生成
-        sdic = {}
-        for skey in skeys:
-            # マップIDと機器ID
-            mapid = skey.string_id().split("_")[0]
-            devid = skey.string_id().split("_")[1]
+        sensor_list = []
+        append=sensor_list.append   # 参照を事前に読み込むことで高速化
+        for skey in sensor_keys:
 
             # 辞書に追加
-            sdic[mapid] = devid
+            append({
+                "mapid" : skey.string_id().split("_")[0],
+                "devid" : skey.string_id().split("_")[1],
+                "label" : skey.string_id().split("_")[2]
+            })
 
         # JSONに変換してキャッシュに保存
-        memcache.add("sensor_" + type, utility.dump_json(sdic))
-        logging.debug("SENSOR GET_SDIC : READ FROM CLOUD STORAGE")
+        memcache.add("sensor_" + type, utility.dump_json(sensor_list))
+        logging.debug("SENSOR GET_LIST : READ FROM CLOUD STORAGE")
 
+    # キャッシュ ヒット
     else:
         # JSONを読み込み
-        sdic = utility.load_json(sjson)
-        logging.debug("SENSOR GET_SDIC : READ FROM MEMCACHE")
+        sensor_list = utility.load_json(sensor_json, charset="ascii")
+        logging.debug("SENSOR GET_LIST : READ FROM MEMCACHE")
 
-    return sdic
+    return sensor_list
+
+
+
+def get_list_devid(type):
+    """指定された種類の機器IDのリストを返す
+
+    Arguments:
+        type  {string} -- 種類
+
+    Returns:
+        string -- 機器ID
+    """
+    # センサID辞書の取得
+    sensor_list = get_list(type)
+
+    # リストの検索
+    results = [x['devid'] for x in sensor_list]
+
+    return results
+
+
+
+def get_list_label(type):
+    """表示名のリストを返す
+
+    Returns:
+        string -- 表示名のリスト
+    """
+    # センサID辞書の取得
+    sensor_list = get_list(type)
+
+    # リストの検索
+    results = [x['label'] for x in sensor_list]
+
+    return results
 
 
 
 def get_devid(mapid, type):
-    """ 指定された種類のセンサをリストアップする
-        @type 種類
+    """マップIDと種類から対応する機器IDを返す
+
+    Arguments:
+        mapid {string} -- マップID
+        type  {string} -- 種類
+
+    Returns:
+        string -- 機器IDまたはNone
     """
-    # センサID辞書の取得
-    sdic = get_sdic(type)
+    # リストの取得
+    sensor_list = get_list(type)
 
-    # 辞書からmapidに対応するdevidを取り出し
-    try:
-        devid = sdic[mapid]
-    except:
-        devid = None
+    # リストの検索
+    results = [x['devid'] for x in sensor_list if x['mapid'] == mapid]
 
-    return devid
+    # 最初にヒットした機器IDを返す
+    result = results[0] if len(results) else None
+
+    return result

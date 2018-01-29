@@ -6,8 +6,8 @@
 # NAME        :Hikaru Yoshida
 #
 
-from google.appengine.ext import ndb        # Datastore API
 from google.appengine.api import memcache   # Memcache API
+from google.appengine.ext import ndb        # Datastore API
 import cgi                                  # URLクエリ文の取得
 import jinja2                               # ページの描画
 import logging                              # ログ出力
@@ -16,6 +16,7 @@ import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
 from py import diary                        # 日誌管理モジュール
+from py import graph                        # グラフデータモジュール
 from py import sensor                       # センサ管理
 from py import utility                      # 汎用関数
 
@@ -65,29 +66,24 @@ class PostWrite(BaseHandler):
         diary.write()
 
 
-# 日誌データの送信
+
 class GetDiary(BaseHandler):
-    # ページ読み込み時処理
+    """日誌データの送信
+    """
     def get(self):
+        """ページ読み込み時処理
+        """
         # パラメータ読み込み
         date  = cgi.escape(self.request.get("date"))
-        mapid = cgi.escape(self.request.get("mapid"))
-        type  = cgi.escape(self.request.get("type"))
-
-        # マップIDを機器IDに変換
-        devid = sensor.get_devid(mapid, type)
-
-        # Nullチェック
-        if devid is None:
-            logging.info("MAIN GETDIARY : DEVID IS NONE")
-            return
+        # mapid = cgi.escape(self.request.get("mapid"))
+        # type  = cgi.escape(self.request.get("type"))
 
         # JSONを返却
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
         self.response.out.write(
             "%s(%s)" %
             (urllib2.unquote(self.request.get('callback')),
-            diary.read(date, devid))
+            graph.gen_dayly(date))
         )
 
 
