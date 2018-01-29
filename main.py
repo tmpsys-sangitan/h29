@@ -66,12 +66,15 @@ class PostWrite(BaseHandler):
         diary.write()
 
 
-# 日誌データの送信
+
 class GetDiary(BaseHandler):
-    # ページ読み込み時処理
+    """日誌データの送信
+    """
     def get(self):
+        """ページ読み込み時処理
+        """
         # パラメータ読み込み
-        # date  = cgi.escape(self.request.get("date"))
+        date  = cgi.escape(self.request.get("date"))
         # mapid = cgi.escape(self.request.get("mapid"))
         # type  = cgi.escape(self.request.get("type"))
 
@@ -80,7 +83,7 @@ class GetDiary(BaseHandler):
         self.response.out.write(
             "%s(%s)" %
             (urllib2.unquote(self.request.get('callback')),
-            graph.gen_dayly())
+            graph.gen_dayly(date))
         )
 
 

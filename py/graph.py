@@ -16,17 +16,20 @@ from py import utility              # 汎用関数
 
 
 
-def gen_dayly(sensors=None):
+def gen_dayly(date):
     """日間グラフを描画するJSONを生成する
 
-    Keyword Arguments:
-        sensors string -- mapidのリスト Noneなら全て (default: {None})
+    Arguments:
+        date {[datatime]} -- 日付を指定
+
+    Returns:
+        json -- 日間グラフ描画用のjsonを発行
     """
 
     # JSONの生成
     graph_json = {
         "cols": gen_cols(sensor.get_list_label("temp")),
-        "rows": gen_rows(utility.str2dt("20171122000000"), sensor.get_list_devid("temp"))
+        "rows": gen_rows(utility.str2dt(date), sensor.get_list_devid("temp"))
     }
 
     # 出力
@@ -98,7 +101,7 @@ def gen_rows(date, devids=None):
         new_line_append=new_line.append  # 参照を事前に読み込むことで高速化
         for open_diary in open_diarys:
             new_line_append({
-                'v': open_diary[utility.t2str(time)].val
+                'v': open_diary[utility.t2str(time)]['val']
             })
 
         # ボディの末端に追加
