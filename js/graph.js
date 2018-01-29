@@ -1,15 +1,16 @@
 // Google Chart Tools API 読込
 google.load('visualization', '1.0', { 'packages': ['corechart'] });
 
-/*
- * グラフの描画クラス
- */
 class Graph {
     /*
-     * コンストラクタ
-     * グラフの基本情報定義
+     * グラフの描画クラス
      */
+
     constructor(label, mapid, startdate, period) {
+        /*
+         * コンストラクタ
+         * グラフの基本情報定義
+         */
 
         // JSONデータの生成
         this.jsondata = new Jsondata(label, mapid, startdate, period);

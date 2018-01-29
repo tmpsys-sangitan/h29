@@ -32,7 +32,8 @@ function read_diary(date, mapid, type, jd) {
             'type' : type
         }
     }).done(function(json){
-        console.log(type + " done");
+        console.log(mapid + " done");
+        console.time(mapid);
 
         // JSONを元にjdを書き換え
         var end_date = new Date(date);
@@ -42,6 +43,7 @@ function read_diary(date, mapid, type, jd) {
             jd.add_data(d, mapid, val);
         }
         console.log(mapid + " resolve");
+        console.timeEnd(mapid);
 
         // プロミスを更新
         df.resolve();

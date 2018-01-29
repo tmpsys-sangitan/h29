@@ -59,9 +59,11 @@ class Jsondata {
         // データ受信完了待ち
         $.when.apply(null, df_array).then(function () {
             console.log("data done");
+            console.time("data");
             // グラフの描画
             j.draw()
             console.log("complete");
+            console.timeEnd("data");
         })
     }
 
