@@ -9,10 +9,7 @@
 from datetime import datetime as dt         # datatime型
 from google.appengine.api import memcache   # Memcache API
 from google.appengine.api import taskqueue  # TaskQueue API
-import errno
-import json                                 # jsonファイル操作
 import logging                              # ログ出力
-import os
 
 from py import gcs                          # GCS操作
 from py import sensor                       # センサ管理
@@ -71,12 +68,12 @@ def cache(date):
     dic = utility.load_json(str_json)
 
     # jsonを分解し、Memcacheへ保存
-    for devid in get_list_devid("temp"):
+    for devid in sensor.get_list_devid("temp"):
         if devid in dic:
             memcache.add(keycache(date, devid), utility.dump_json(dic[devid]))
         else:
             memcache.add(keycache(date, devid), utility.dump_json({devid : {}}))
-        logging.debug("DIARY CACHE : WRITE " + keycache(date, devid))
+        logging.debug("DIARY CACHE : WRITE %s", keycache(date, devid))
 
     return
 
@@ -174,10 +171,10 @@ def write():
             # リクエストから各データ取り出し
             payload = utility.load_json(task.payload)
 
-            date  = payload['date']
+            date = payload['date']
             devid = payload['devid']
-            time  = payload['time']
-            data  = payload['data']
+            time = payload['time']
+            data = payload['data']
 
             # 作業用リストからJSONを読み込み
             if date not in slist_date:
