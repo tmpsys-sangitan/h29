@@ -53,7 +53,6 @@ class Graph {
      */
     draw() {
         var json = _jsondata;
-        console.log(_jsondata);
         var datatable = new google.visualization.DataTable(json);
         this.chart.draw(datatable, this.options);
     }
