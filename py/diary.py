@@ -108,7 +108,7 @@ def add(date, devid, fi, bv, val, ad):
     # キャッシュから日誌データの読み込み
     try:
         djson = read(date, devid)
-    except IOError:
+    except NotFoundError:
         djson = new(date, devid)
 
     # jsonを辞書型に変換
