@@ -7,7 +7,11 @@
 #
 
 from datetime import datetime as dt         # datatime型
-import json                                 # jsonファイル操作
+import json                                 # JSONファイル操作
+from json import encoder                    # JSONエンコーダ
+
+# 浮動小数点の出力を小数第一位までに制限
+encoder.FLOAT_REPR = lambda o: format(o, '.1f')
 
 def str2dt(string):
     """ yyyymmddHHMMSS(20180118113940)を日時型に変換する

@@ -9,6 +9,7 @@
 from datetime import datetime as dt         # datatime型
 from google.appengine.api import memcache   # Memcache API
 from google.appengine.api import taskqueue  # TaskQueue API
+import cloudstorage as storage              # GCS API
 import logging                              # ログ出力
 
 from py import gcs                          # GCS操作
@@ -105,10 +106,10 @@ def add(date, devid, fi, bv, val, ad):
         @devid 機器ID
     """
 
+    # キャッシュから日誌データの読み込み
     try:
-        # キャッシュから日誌データの読み込み
         djson = read(date, devid)
-    except IOError:
+    except storage.NotFoundError:
         djson = new(date, devid)
 
     # jsonを辞書型に変換
@@ -116,7 +117,7 @@ def add(date, devid, fi, bv, val, ad):
 
     # データの重複チェック
     timekey = utility.t2str(date)
-    if timekey in dic[devid]:
+    if timekey in dic:
         # 重複エラーで終了
         return
 
