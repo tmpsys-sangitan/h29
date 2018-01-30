@@ -44,7 +44,7 @@ function get_diary(date, jd) {
     var df = new $.Deferred();
 
     // URL生成
-    var url = 'http://tmpsys-sangitan.appspot.com/diary';
+    var url = '//tmpsys-sangitan.appspot.com/diary';
 
     // 日付が今日ならキャッシュしない
     var cachemode = true;
