@@ -16,11 +16,6 @@
 {# <head></head>内の記述 #}
 {% block lib %}
 	{{ super() }}
-{% endblock %}
-
-{# ページのヘッダー #}
-{% block header %}
-	{{ super() }}
 	{# jqueryを読み込み #}
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 	{# jquery-uiを読み込み #}
@@ -33,6 +28,11 @@
     <script type="text/javascript" src="./js/graph.js"></script>
 	{# jsondata.jsを読み込み #}
     <script type="text/javascript" src="./js/jsondata.js"></script>
+{% endblock %}
+
+{# ページのヘッダー #}
+{% block header %}
+	{{ super() }}
 {% endblock %}
 
 {# ページのコンテンツ #}
