@@ -38,7 +38,7 @@ def write_file(filename, content, content_type):
     bucket_name = get_bucket_name()
     filepath = '/' + bucket_name + '/' + filename
     with storage.open(filepath, 'w', content_type=content_type) as gcs_file:
-        gcs_file.write(content)
+        gcs_file.write(content.encode('utf-8'))
 
 
 def read_file(filename):
