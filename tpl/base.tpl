@@ -30,18 +30,8 @@
 		{% endblock %}
 	</div>
 
-	<div id="menu">
-		<ul>
-			<li><a href="./">Top</a></li>
-			<li><a href="./graph">Graph</a></li>
-			<li><a href="./map">Map</a></li>
-		</ul>
-	</div>
-
-	<div id="content">
-		{% block content %}
-		{% endblock %}
-	</div>
+	{% block content %}
+	{% endblock %}
 
 	<div id="footer">
 		{% block footer %}

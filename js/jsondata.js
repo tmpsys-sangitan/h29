@@ -29,7 +29,6 @@ function gen_jsondata(label, mapid, startdate, period) {
         this.get_diary(new Date(startdate))
     ).then(function () {
         console.log("data done");
-        console.log(_jsondata);
         // グラフの描画
         j.draw()
         console.log("complete");
@@ -70,7 +69,6 @@ function get_diary(date, jd) {
     }).done(function (json) {
         // JSONを格納
         _jsondata = json;
-        console.log(_jsondata);
 
         // プロミスを更新
         df.resolve();
