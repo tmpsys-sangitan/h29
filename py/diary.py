@@ -9,6 +9,7 @@
 from datetime import datetime as dt         # datatime型
 from google.appengine.api import memcache   # Memcache API
 from google.appengine.api import taskqueue  # TaskQueue API
+import cloudstorage as storage              # GCS API
 import logging                              # ログ出力
 
 from py import gcs                          # GCS操作
@@ -108,7 +109,7 @@ def add(date, devid, fi, bv, val, ad):
     # キャッシュから日誌データの読み込み
     try:
         djson = read(date, devid)
-    except NotFoundError:
+    except storage.NotFoundError:
         djson = new(date, devid)
 
     # jsonを辞書型に変換
