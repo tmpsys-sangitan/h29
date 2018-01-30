@@ -1,10 +1,10 @@
 # coding: UTF-8
-#
-# FILE        :diary.py
-# DATE        :2018.01.17
-# DESCRIPTION :日誌管理モジュール
-# NAME        :Hikaru Yoshida
-#
+'''
+FILE        :diary.py
+DATE        :2018.01.17
+DESCRIPTION :日誌管理モジュール
+NAME        :Hikaru Yoshida
+'''
 
 from datetime import datetime as dt         # datatime型
 from google.appengine.api import memcache   # Memcache API
@@ -24,8 +24,7 @@ def keycache(date, devid):
     """
     if isinstance(date, dt):
         return "data_" + utility.d2str(date) + "_" + devid
-    else:
-        return "data_" + date + "_" + devid
+    return "data_" + date + "_" + devid
 
 
 
@@ -35,8 +34,7 @@ def keystr(date):
     """
     if isinstance(date, dt):
         return "data_" + utility.d2str(date) + ".json"
-    else:
-        return "data_" + date + ".json"
+    return "data_" + date + ".json"
 
 
 
@@ -100,7 +98,7 @@ def new(date, devid):
 
 
 
-def add(date, devid, fi, bv, val, ad):
+def add(date, devid, intensity, voltage, val, digital):
     """ 日誌に新たなデータを仮追加する
         @date  日付
         @devid 機器ID
@@ -108,48 +106,51 @@ def add(date, devid, fi, bv, val, ad):
 
     # キャッシュから日誌データの読み込み
     try:
-        djson = read(date, devid)
+        diary_json = read(date, devid)
+        diary_dic = utility.load_json(diary_json)
     except storage.NotFoundError:
-        djson = new(date, devid)
-
-    # jsonを辞書型に変換
-    dic = utility.load_json(djson)
+        diary_dic = {}
 
     # データの重複チェック
     timekey = utility.t2str(date)
-    if timekey in dic:
+    if timekey in diary_dic:
         # 重複エラーで終了
         return
 
     # 新しいデータを辞書型に変換
-    newdata = {
-        "fi"    : int(fi),
-        "bv"    : int(bv),
-        "val"   : round(float(val), 1),
-        "ad"    : int(ad)
+    new_time = utility.t2str(date)
+    new_data = {
+        "intensity" : int(intensity),
+        "voltage"   : int(voltage),
+        "val"       : round(float(val), 1),
+        "digital"   : int(digital)
     }
 
+    # 辞書確認、なければ追加
+    if devid not in diary_dic:
+        diary_dic[devid] = {}
+
     # 新しいデータを辞書に追加してjsonに変換
-    dic[devid][utility.t2str(date)] = newdata
-    djson = utility.dump_json(dic)
+    diary_dic[devid][new_time] = new_data
+    diary_json = utility.dump_json(diary_dic)
 
     # キャッシュ更新
     memcache.delete(keycache(date, devid))
-    memcache.add(keycache(date, devid), djson)
+    memcache.add(keycache(date, devid), diary_json)
 
     # リクエストを作成
     payload = utility.dump_json({
         'devid' : devid,
         'date'  : utility.d2str(date),
-        'time'  : utility.t2str(date),
-        'data'  : newdata
+        'time'  : new_time,
+        'data'  : new_data
     })
 
     # Storage更新リクエスト送信
-    q = taskqueue.Queue('StorageWriteRequestQueue')
+    queue = taskqueue.Queue('StorageWriteRequestQueue')
     tasks = []
     tasks.append(taskqueue.Task(payload=payload, method='PULL'))
-    q.add(tasks)
+    queue.add(tasks)
 
 
 
@@ -158,62 +159,66 @@ def write():
     """
 
     # タスクの取得
-    q = taskqueue.Queue('StorageWriteRequestQueue')
-    tasks = q.lease_tasks(60, 100)
+    queue = taskqueue.Queue('StorageWriteRequestQueue')
+    tasks = queue.lease_tasks(60, 100)
 
     # タスクが空でないなら
     if bool(tasks):
         # 作業用リストを生成
-        slist_date = []
-        slist_dic = []
+        temp_dic = {}
 
         # リクエストの消化
         for task in tasks:
             # リクエストから各データ取り出し
             payload = utility.load_json(task.payload)
-
             date = payload['date']
             devid = payload['devid']
             time = payload['time']
             data = payload['data']
 
-            # 作業用リストからJSONを読み込み
-            if date not in slist_date:
+            # 作業用辞書に読込済みか確認
+            if date not in temp_dic:
+                # 新しい辞書を作成
+                temp_dic[date] = {}
+                temp_dic[date]['task'] = []
+
                 # StorageからJSONを読み込み作業用辞書に追加
                 try:
-                    str_json = gcs.read_file(keystr(date))
-                    str_dic = utility.load_json(str_json)
-                    slist_dic.append(str_dic)
-                    slist_date.append(date)
-                except:
-                    slist_dic.append(new(date, devid))
-                    logging.info("DIARY WRITE : NEW " + task.name)
-                else:
-                    logging.info("OPEN : " + keystr(date))
 
-            # index取得
-            index = slist_date.index(date)
+                    gcs_json = gcs.read_file(keystr(date))
+                    gcs_dic = utility.load_json(gcs_json)
+                    temp_dic[date]['json'] = gcs_dic
+                    logging.info("OPEN : %s", keystr(date))
+
+                # Storageに新たなJSONを作成し作業用
+                except storage.NotFoundError:
+                    temp_dic[date]['json'] = {}
+                    logging.info("DIARY WRITE : NEW %s", task.name)
+
+            # taskの紐づけ
+            temp_dic[date]['task'].append(task)
 
             # 辞書確認、なければ追加
-            if devid not in slist_dic[index]:
-                slist_dic[index][devid] = {}
+            if devid not in temp_dic[date]['json']:
+                temp_dic[date]['json'][devid] = {}
 
             # 辞書に新しいデータを追加
-            slist_dic[index][devid][time] = data
+            temp_dic[date]['json'][devid][time] = data
 
         # 作業用辞書の変更をStorageにアップロード
-        try:
-            for (date, dic) in zip(slist_date, slist_dic):
-                # 辞書型をJSONに変換
-                str_json = utility.dump_json(dic)
+        for (date, dic) in temp_dic.items():
+            # 辞書型をJSONに変換
+            gcs_json = utility.dump_json(dic['json'])
 
-                # Storageにアップロード、成功したらタスクを消去
-                try:
-                    gcs.write_file(keystr(date), str_json, "application/json")
-                    logging.info("DIARY WRITE : " + keystr(date))
-                except:
-                    pass
-        except:
-            logging.info(str_json)
-        else:
-            q.delete_tasks(tasks)
+            # Storageにアップロード
+            try:
+                gcs.write_file(keystr(date), gcs_json, "application/json")
+                logging.info("DIARY WRITE : %s", keystr(date))
+
+            # エラーログ
+            except storage.ServerError as error:
+                logging.warning("DIARY WRITE : ERROR %s", error)
+
+            # 成功した場合のみタスクを消去
+            else:
+                queue.delete_tasks(dic['task'])
