@@ -105,8 +105,8 @@ def add(date, devid, fi, bv, val, ad):
         @devid 機器ID
     """
 
+    # キャッシュから日誌データの読み込み
     try:
-        # キャッシュから日誌データの読み込み
         djson = read(date, devid)
     except IOError:
         djson = new(date, devid)
@@ -116,7 +116,7 @@ def add(date, devid, fi, bv, val, ad):
 
     # データの重複チェック
     timekey = utility.t2str(date)
-    if timekey in dic[devid]:
+    if timekey in dic:
         # 重複エラーで終了
         return
 
