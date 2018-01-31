@@ -22,6 +22,8 @@ ENV = jinja2.Environment(
     loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
     extensions=['jinja2.ext.autoescape'], autoescape=True)
 
+
+
 class BaseHandler(webapp2.RequestHandler):
     """ページの表示
     """
@@ -91,6 +93,7 @@ class PostWrite(BaseHandler):
         diary.write()
 
 
+
 class GetDiary(BaseHandler):
     """日誌データの送信
     """
@@ -107,13 +110,14 @@ class GetDiary(BaseHandler):
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
         self.response.out.write(
             "%s(%s)" %
-            (urllib2.unquote(self.request.get('callback')),
+            ('callback',
              graph.gen_dayly(date))
         )
 
 
+
 # URL - 関数 対応
-APP = webapp2.WSGIApplication([
+app = webapp2.WSGIApplication([
     # ページ
     webapp2.Route('/', MainPage),
 
