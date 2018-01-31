@@ -1,80 +1,105 @@
 # coding: UTF-8
-#
-# FILE        :main.py
-# DATE        :2017.12.04
-# DESCRIPTION :メインプログラム
-# NAME        :Hikaru Yoshida
-#
 
-from google.appengine.api import memcache   # Memcache API
-from google.appengine.ext import ndb        # Datastore API
+"""
+FILE        :main.py
+DATE        :2017.12.04
+DESCRIPTION :メインプログラム
+NAME        :Hikaru Yoshida
+"""
+
 import cgi                                  # URLクエリ文の取得
 import jinja2                               # ページの描画
-import logging                              # ログ出力
 import os                                   # OSインターフェイス
 import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
 from py import diary                        # 日誌管理モジュール
 from py import graph                        # グラフデータモジュール
-from py import sensor                       # センサ管理
 from py import utility                      # 汎用関数
 
 # テンプレートファイルを読み込む環境を作成
-env = jinja2.Environment( \
-    loader     = jinja2.FileSystemLoader(os.path.dirname(__file__)), \
-    extensions = ['jinja2.ext.autoescape'],autoescape=True)
+ENV = jinja2.Environment(
+    loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+    extensions=['jinja2.ext.autoescape'], autoescape=True)
 
-# ページの表示
 class BaseHandler(webapp2.RequestHandler):
-    def render(self, tpl, values={}):
+    """ページの表示
+    """
+
+    def render(self, tpl, values=None):
+        """ページの表示
+
+        Arguments:
+            tpl {[string]} -- ベースになるhtml/tplファイル名
+            values {[dictionary]} -- 入力するパラメータ
+        """
+        # valseに指定がないなら空辞書を生成
+        values = values or {}
+
+        # テンプレートを組み立ててレスポンスに書く
         self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
-        tpl_file = env.get_template(tpl)
+        tpl_file = ENV.get_template(tpl)
         self.response.write(tpl_file.render(values))
 
 
-# /       メインページ
+
 class MainPage(BaseHandler):
-    # ページ読み込み時処理
+    """/       メインページ
+    """
+
     def get(self):
+        """ページ読み込み時処理
+        """
         self.render('tpl/main.tpl')
 
 
-# /upload アップロードページ
+
 class PostUpload(BaseHandler):
-    # ページ読み込み時処理
+    """/upload アップロードページ
+    """
+
     def get(self):
+        """ページ読み込み時処理
+        """
         self.render('tpl/upload.tpl')
 
-    # 送信
     def post(self):
+        """送信時処理
+        """
+
         # パラメータ読み込み
         devid = cgi.escape(self.request.get("devid"))
-        date  = cgi.escape(self.request.get("date"))
-        fi    = cgi.escape(self.request.get("fi"))
-        bv    = cgi.escape(self.request.get("bv"))
-        val   = cgi.escape(self.request.get("val"))
-        ad    = cgi.escape(self.request.get("ad"))
+        date = cgi.escape(self.request.get("date"))
+        intensity = cgi.escape(self.request.get("fi"))
+        voltage = cgi.escape(self.request.get("bv"))
+        val = cgi.escape(self.request.get("val"))
+        digital = cgi.escape(self.request.get("ad"))
 
         # 日誌に仮追加
-        diary.add(utility.str2dt(date), devid, fi, bv, val, ad)
+        diary.add(utility.str2dt(date), devid, intensity, voltage, val, digital)
 
 
-# 仮追加を確定し、Storageに書込む
+
 class PostWrite(BaseHandler):
-    def get(self):
-        diary.write()
+    """仮追加を確定し、Storageに書込む
+    """
 
+    @classmethod
+    def get(cls):
+        """ページ読み込み時処理
+        """
+        diary.write()
 
 
 class GetDiary(BaseHandler):
     """日誌データの送信
     """
+
     def get(self):
         """ページ読み込み時処理
         """
         # パラメータ読み込み
-        date  = cgi.escape(self.request.get("date"))
+        date = cgi.escape(self.request.get("date"))
         # mapid = cgi.escape(self.request.get("mapid"))
         # type  = cgi.escape(self.request.get("type"))
 
@@ -83,19 +108,19 @@ class GetDiary(BaseHandler):
         self.response.out.write(
             "%s(%s)" %
             (urllib2.unquote(self.request.get('callback')),
-            graph.gen_dayly(date))
+             graph.gen_dayly(date))
         )
 
 
 # URL - 関数 対応
-app = webapp2.WSGIApplication([
+APP = webapp2.WSGIApplication([
     # ページ
-    webapp2.Route('/'      , MainPage),
+    webapp2.Route('/', MainPage),
 
     # POST
     webapp2.Route('/upload', PostUpload),
-    webapp2.Route('/write' , PostWrite),
+    webapp2.Route('/write', PostWrite),
 
     # GET
-    webapp2.Route('/diary' , GetDiary),
+    webapp2.Route('/diary', GetDiary),
 ])

@@ -1,10 +1,11 @@
 # coding: UTF-8
-#
+
+'''
 # FILE        :graph.py
 # DATE        :2018.01.25
 # DESCRIPTION :グラフデータモジュール
 # NAME        :Hikaru Yoshida
-#
+'''
 
 from datetime import datetime as dt # datatime型
 from datetime import timedelta      # 相対時間型
@@ -48,14 +49,12 @@ def gen_cols(labels):
     """
 
     # 雛形の定義
-    cols = [
-            {
-                'type': "datetime"
-            }
-    ]
+    cols = [{
+        'type': "datetime"
+    }]
 
     # sensorsのデータを追加
-    append=cols.append  # 参照を事前に読み込むことで高速化
+    append = cols.append  # 参照を事前に読み込むことで高速化
     for label in labels:
         append({
             'label': label,
@@ -93,12 +92,12 @@ def gen_rows(date, devids=None):
     time = dt.combine(date, datetime.time.min)
     while time < dt.combine(date, datetime.time.max):
         # 横軸の入力
-        new_line = [
-                { 'v': utility.dt2date(time) }
-        ]
+        new_line = [{
+            'v': utility.dt2date(time)
+        }]
 
         # 縦軸の入力
-        new_line_append=new_line.append  # 参照を事前に読み込むことで高速化
+        new_line_append = new_line.append  # 参照を事前に読み込むことで高速化
         for open_diary in open_diarys:
             new_line_append({
                 'v': open_diary[utility.t2str(time)]['val']
