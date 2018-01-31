@@ -38,8 +38,6 @@
 {# ページのコンテンツ #}
 {% block content %}
 	{# グラフ #}
-	<div id="content">
-
 	<div id="graphField">Now Loading ...</div>
 	<script type="text/javascript">
 		mapid_list = [
@@ -76,6 +74,8 @@
 			</tr>
 		</table>
 	</div>
+	<div id="mapField">
+		2F
 		<table id="map">
 			<tr>
 				<td class="less"></td>
@@ -99,7 +99,9 @@
 				<td class="snsr 2fsemi">F2ゼミ室</td>
 			</tr>
 		</table>
-		<br>
+	</div>
+	<div id="mapField">
+		1F
 		<table id="map">
 			<tr>
 				<td class="less"></td>
@@ -125,6 +127,7 @@
 				<td class="less"></td>
 			</tr>
 		</table>
+	</div>
 
 	{# What this? #}
 	<div id="content">
