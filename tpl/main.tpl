@@ -37,16 +37,27 @@
 
 {# ページのコンテンツ #}
 {% block content %}
-	{# グラフ #}
-	<div id="graphField">Now Loading ...</div>
-	<script type="text/javascript">
-		mapid_list = [
-			"test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8",
-			"test9", "test10", "test11", "test12", "test13", "test14", "test15", "test16"
-		]
+	<div id="content">
+		{# 日付ピッカー #}
+		<script>
+			$(function () {
+				$.datepicker.setDefaults($.datepicker.regional["ja"]);
+				$("#daytxt").datepicker();
+			});
+		</script>
+		<div id='form'>日付:<input type="text" id="daytxt" /></div>
 
-		var j = new Graph(mapid_list, "2017/11/22 00:00:00 +0900", "day");
-	</script>
+		{# グラフ #}
+		<div id="graphField">Now Loading ...</div>
+		<script type="text/javascript">
+			mapid_list = [
+				"test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8",
+				"test9", "test10", "test11", "test12", "test13", "test14", "test15", "test16"
+			]
+
+			var j = new Graph(mapid_list, "2017/11/22 00:00:00 +0900", "day");
+		</script>
+	</div>
 
 	{# マップ #}
 	<div id="mapField">
