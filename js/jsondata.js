@@ -16,10 +16,10 @@ var formatDate = function (date, format) {
 
 var _jsondata;
 
-/*
- * データテーブル用JSON管理クラス
- */
-function gen_jsondata(label, mapid, startdate, period) {
+function gen_jsondata(mapid, startdate, period) {
+    /*
+     * データテーブル用JSON管理クラス
+     */
 
     // JSONの宣言
     this.json = JSON.stringify();
@@ -35,11 +35,12 @@ function gen_jsondata(label, mapid, startdate, period) {
     })
 }
 
-/*
- * 日誌の読み込み
- * @date Datatime型 日付
- */
 function get_diary(date, jd) {
+    /*
+     * 日誌の読み込み
+     * @date Datatime型 日付
+     */
+
     // ディファードの宣言
     var df = new $.Deferred();
 
