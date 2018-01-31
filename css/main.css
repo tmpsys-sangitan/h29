@@ -4,7 +4,7 @@
  * ページ全体
  */
 body{
-    max-width: 1024px;
+    max-width: 960px;
     width: 100%;
     margin: auto;
     background-image:
@@ -15,6 +15,8 @@ body{
     background-size: 2px;
     background-repeat: repeat;
 }
+
+
 
 /*
  * ヘッダー
@@ -121,10 +123,12 @@ body{
 #menu a:hover{
     background:#E5E5E5;
 }
+
 /*
  * 本文
  */
- #content{
+#content{
+    margin:20px 0px;
     font-size: 125%;
     background-color: #ffffff;
 }
@@ -135,15 +139,22 @@ body{
 }
 
 
+
 /*
  * グラフ
  */
 #graphField{
-    margin:20px 10px;
+    margin:20px 0px;
     padding:0;
     width:100%;
-    height:350px;
+    height:480px;
+    background-color: #ffffff;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
 }
+
+
 
 /*
  * フッター回り
