@@ -9,17 +9,17 @@ class Graph {
      * コンストラクタ
      * グラフの基本情報定義
      */
-    constructor(label, mapid, startdate, period) {
+    constructor(mapid, startdate, period) {
 
         // JSONデータの生成
-        gen_jsondata(label, mapid, startdate, period);
+        gen_jsondata(mapid, startdate, period);
 
         // グラフの描画準備
         this.options = {
             // タイトル
             title: '気温グラフ',
             // タイトルのフォント設定
-            titleTextStyle: { fontName: 'Meiryo', fontSize: 30 },
+            titleTextStyle: { fontName: 'Meiryo', fontSize: 24 },
             // 描画エリアの設定
             chartArea: { 'width': '90%', 'height': '65%' },
             // 横ラベル
@@ -32,7 +32,7 @@ class Graph {
                 title: '温度',
                 titleTextStyle: { italic: false },
                 viewWindow:{
-                    max:30,
+                    max:35,
                     min:0
                 }
             },
@@ -41,7 +41,11 @@ class Graph {
             // カーソルを合わせた時に同じ縦軸のデータをまとめて表示
             focusTarget: 'category',
             // 凡例
-            legend: { position: 'bottom' }
+            legend: {
+                position: 'top',
+                maxLines: 2,
+                textStyle: {color: 'royalblue', fontSize: 10.5}
+            }
         };
 
         // グラフの描画先を指定
