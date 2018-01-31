@@ -39,10 +39,59 @@ body{
     margin-bottom: 0px;
 }
 
+
+
+/*
+ * マップ
+ */
+#mapField{
+    margin:20px 0px;
+    margin: auto;
+}
+
+#map{
+    width: 756px;
+    height: 252px;
+    border-spacing: 0;
+}
+
+#map a{
+    font-size: 14px;
+    text-decoration: none;
+    text-shadow: rgba(255,255,255,0.6) -1px 1px 0;
+}
+
+#map td{
+    width: 80px;
+    height: 80px;
+    text-align: center;
+    background-color: #eef2bf;
+}
+
+#map .corr{
+    border: 1px solid #e5e5e5;
+    background-color: #e5e5e5;
+}
+
+#map .snsr{
+    border: 1px solid #fff;
+    background-color: #eef2bf;
+}
+
+#map .less{
+    border: 1px solid #fff;
+    background-color: #888;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+
+
 /*
  * メニュー
  */
-#menu{
+ #menu{
     display: block;
 }
 
@@ -75,7 +124,7 @@ body{
 /*
  * 本文
  */
-#content{
+ #content{
     font-size: 125%;
     background-color: #ffffff;
 }
