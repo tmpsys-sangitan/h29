@@ -43,11 +43,23 @@
 		<script>
 			$(function () {
 				$.datepicker.setDefaults($.datepicker.regional["ja"]);
-				$("#daytxt").datepicker();
+				$("#select_date").datepicker();
 			});
 		</script>
-		<div id='form'>日付:<input type="text" id="daytxt" /></div>
-
+		<div id='graphOptionList'>
+			<div id='graphOption'>
+				日付:<input type="text" id="select_date" placeholder="2017/11/22"/>
+			</div>
+			<div id='graphOption'>
+				期間:<select id="select_period"><option value="all">日間</option></select>
+			</div>
+			<div id='graphOption'>
+				場所:<select id="select_location"><option value="all">全て</option></select>
+			</div>
+			<div id='graphOption'>
+				種類:<select id="select_location"><option value="all">温度</option></select>
+			</div>
+		</div>
 		{# グラフ #}
 		<div id="graphField">Now Loading ...</div>
 		<script type="text/javascript">

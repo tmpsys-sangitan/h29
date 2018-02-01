@@ -94,6 +94,30 @@ body{
 
 
 /*
+ * 入力フォーム
+ */
+#graphOptionList{
+    display: flex;
+    justify-content: center;
+}
+#graphOption{
+    margin: 0px 4px;
+}
+#graphOption input{
+    vertical-align:middle;
+    font-size: 125%;
+    width:176px;
+}
+#graphOption select{
+    vertical-align:middle;
+    font-size: 125%;
+    width:180px;
+    height:35px;
+}
+
+
+
+/*
  * グラフ
  */
 #graphField{
