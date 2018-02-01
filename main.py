@@ -124,14 +124,14 @@ class GetLatest(BaseHandler):
         """ページ読み込み時処理
         """
         # パラメータ読み込み
-        mapid = cgi.escape(self.request.get("mapid"))
+        sensor_type = cgi.escape(self.request.get("type"))
 
         # JSONを返却
         self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
         self.response.out.write(
             "%s(%s)" %
             ('callback',
-             heatmap.get_latest(mapid))
+             heatmap.get_latest(sensor_type))
         )
 
 

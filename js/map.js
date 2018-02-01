@@ -1,12 +1,32 @@
 var HeatMap = {
-    searchSensor: function(){
+
+    getLatest: function(sensor_type){
+        /*
+         * 最新温度データの取得
+         * sensor_type : 取得したいマップIDの配列
+         */
+        return $.ajax({
+            cache: false,
+            dataType: 'jsonp',
+            jsonpCallback: 'callback',
+            type: 'GET',
+            url: url + 'latest',
+            data: {
+                'type': sensor_type
+            }
+        }).done(function (json){
+            HeatMap.searchSensor(json);
+        });
+    },
+    searchSensor: function(latest_json){
         /*
          * searchSensor .snsrクラスを検索して温度の表示と背景色の変更を行う
-         * id : 変更する要素
-         * temp : 温度
+         * latest_json : 最新温度データのJSON
          */
+
         jQuery('.snsr').each(function(){
-            var temp = Math.floor(Math.random()*35);
+            console.log($(this).attr('class').split(' ')[1]);
+            var temp = latest_json[$(this).attr('class').split(' ')[1]]
             HeatMap.setNewlabel(this, temp);
             HeatMap.setBGColor(this, temp);
         });

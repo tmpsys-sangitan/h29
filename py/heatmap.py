@@ -9,9 +9,10 @@
 
 import random           # 乱数
 
+from py import sensor   # センサ管理
 from py import utility  # 汎用関数
 
-def get_latest(mapids):
+def get_latest(sensor_type):
     """[指定されたマップidの最新温度データを返す]
 
     Arguments:
@@ -21,7 +22,7 @@ def get_latest(mapids):
     res_dic = {}
 
     # マップIDごとの配列生成
-    for mapid in mapids:
+    for mapid in sensor.get_list_mapid(sensor_type):
         res_dic[mapid] = round(random.uniform(10.0, 35.0), 1)
 
     # JSONに変換して出力

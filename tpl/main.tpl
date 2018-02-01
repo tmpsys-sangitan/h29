@@ -31,6 +31,10 @@
     <script type="text/javascript" src="./js/jsondata.js"></script>
 	{# map.jsを読み込み #}
     <script type="text/javascript" src="./js/map.js"></script>
+	{# ページ固有設定 #}
+	<script>
+		var url = '//tmpsys-sangitan.appspot.com/'
+	</script>
 {% endblock %}
 
 {# ページのヘッダー #}
@@ -65,7 +69,7 @@
 		{# グラフ #}
 		<div id="graphField">Now Loading ...</div>
 		<script type="text/javascript">
-			mapid_list = [
+			var mapid_list = [
 				"test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8",
 				"test9", "test10", "test11", "test12", "test13", "test14", "test15", "test16"
 			]
@@ -77,7 +81,7 @@
 	{# マップ #}
 	<script>
 		$(function () {
-			HeatMap.searchSensor();
+			HeatMap.getLatest('temp');
 		});
 	</script>
 	<div id="mapField">
@@ -86,7 +90,7 @@
 			<tr>
 				<td class="snsr s2cr">S2教室</td>
 				<td class="corr"></td>
-				<td class="snsr t1lab" colspan="2">実習室</td>
+				<td class="snsr t1lab" colspan="2">T1実習室</td>
 				<td class="less"></td>
 				<td class="less"></td>
 				<td class="less"></td>
@@ -100,7 +104,7 @@
 			<tr>
 				<td class="snsr 3fsemi">3Fゼミ室</td>
 				<td class="snsr net" colspan="2">ネットワーク<br>実習室</td>
-				<td class="snsr t2lab" colspan="2">実習室</td>
+				<td class="snsr t2lab" colspan="2">T2実習室</td>
 				<td class="snsr img" colspan="2">画像処理室</td>
 				<td class="snsr t2cr">T2教室</td>
 				<td class="less"></td>
@@ -114,7 +118,7 @@
 				<td class="corr"></td>
 				<td class="less"></td>
 				<td class="corr"></td>
-				<td class="snsr s2lab" colspan="2">実習室</td>
+				<td class="snsr s2lab" colspan="2">S2実習室</td>
 				<td class="snsr 2ftr">教官室</td>
 				<td class="less"></td>
 				<td class="less"></td>
@@ -126,7 +130,7 @@
 			</tr>
 			<tr>
 				<td class="corr"></td>
-				<td class="snsr s1lab" colspan="2">実習室</td>
+				<td class="snsr s1lab" colspan="2">S1実習室</td>
 				<td class="snsr s1cr">S1教室</td>
 				<td class="snsr t1cr">T1教室</td>
 				<td class="corr"></td>
