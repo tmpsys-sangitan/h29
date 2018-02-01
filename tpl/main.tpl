@@ -70,11 +70,11 @@
 		<div id="graphField">Now Loading ...</div>
 		<script type="text/javascript">
 			var mapid_list = [
-				"test1", "test2", "test3", "test4", "test5", "test6", "test7", "test8",
-				"test9", "test10", "test11", "test12", "test13", "test14", "test15", "test16"
+				"s2cr", "t1lab", "elec", "3fsemi", "net", "t2lab", "img", "t2cr",
+				"s2lab", "2ftr", "wslab", "s1lab", "s1cr", "t1cr", "2fsemi", "1ftr"
 			]
 
-			//var j = new Graph(mapid_list, "2017/11/22 00:00:00 +0900", "day");
+			var j = new Graph(mapid_list, "2017/11/22 00:00:00 +0900", "day");
 		</script>
 	</div>
 

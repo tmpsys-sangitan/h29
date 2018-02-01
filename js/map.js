@@ -25,7 +25,6 @@ var HeatMap = {
          */
 
         jQuery('.snsr').each(function(){
-            console.log($(this).attr('class').split(' ')[1]);
             var temp = latest_json[$(this).attr('class').split(' ')[1]]
             HeatMap.setNewlabel(this, temp);
             HeatMap.setBGColor(this, temp);
