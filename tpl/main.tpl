@@ -29,6 +29,8 @@
     <script type="text/javascript" src="./js/graph.js"></script>
 	{# jsondata.jsを読み込み #}
     <script type="text/javascript" src="./js/jsondata.js"></script>
+	{# map.jsを読み込み #}
+    <script type="text/javascript" src="./js/map.js"></script>
 {% endblock %}
 
 {# ページのヘッダー #}
@@ -68,11 +70,16 @@
 				"test9", "test10", "test11", "test12", "test13", "test14", "test15", "test16"
 			]
 
-			var j = new Graph(mapid_list, "2017/11/22 00:00:00 +0900", "day");
+			//var j = new Graph(mapid_list, "2017/11/22 00:00:00 +0900", "day");
 		</script>
 	</div>
 
 	{# マップ #}
+	<script>
+		$(function () {
+			HeatMap.searchSensor();
+		});
+	</script>
 	<div id="mapField">
 		<h2>3F</h2>
 		<table id="map">
@@ -112,7 +119,7 @@
 				<td class="less"></td>
 				<td class="less"></td>
 				<td class="corr"></td>
-				<td rowspan="3">UNIX</td>
+				<td class="snsr wslab" rowspan="3">WS実習室</td>
 			</tr>
 			<tr>
 				<td class="corr" colspan="9"></td>
