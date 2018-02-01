@@ -13,12 +13,12 @@ import logging                              # ログ出力
 from py import utility                      # 汎用関数
 
 # Datastoreでの種類とプロパティ定義
-class sensor(ndb.Model):
-    """ データストア：種類センサのデータ
+class Sensor(ndb.Model):
+    """ Datastore 種類センサのデータ
     """
 
     # センサ種類
-    type = ndb.StringProperty()
+    sensor_type = ndb.StringProperty()
 
 
 
@@ -30,7 +30,7 @@ def get_sdic(type):
     sjson = memcache.get("sensor_" + type)
     if sjson is None:
         # データストアからリストの取得
-        skeys = sensor.query(sensor.type == type).fetch(keys_only=True)
+        skeys = Sensor.query(Sensor.sensor_type == type).fetch(keys_only=True)
 
         # 辞書の生成
         sdic = {}
