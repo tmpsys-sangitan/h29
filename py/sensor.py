@@ -67,6 +67,25 @@ def get_list(sensor_type):
 
 
 
+def get_list_mapid(sensor_type):
+    """指定された種類のマップIDのリストを返す
+
+    Arguments:
+        sensor_type  {string} -- 種類
+
+    Returns:
+        string -- マップID
+    """
+    # センサID辞書の取得
+    sensor_list = get_list(sensor_type)
+
+    # リストの検索
+    results = [x['mapid'] for x in sensor_list]
+
+    return results
+
+
+
 def get_list_devid(sensor_type):
     """指定された種類の機器IDのリストを返す
 

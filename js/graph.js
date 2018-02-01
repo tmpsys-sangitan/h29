@@ -16,12 +16,8 @@ class Graph {
 
         // グラフの描画準備
         this.options = {
-            // タイトル
-            title: '気温グラフ',
-            // タイトルのフォント設定
-            titleTextStyle: { fontName: 'Meiryo', fontSize: 24 },
             // 描画エリアの設定
-            chartArea: { 'width': '90%', 'height': '65%' },
+            chartArea: { 'width': '90%', 'height': '75%' },
             // 横ラベル
             hAxis: {
                 title: '時間',
@@ -29,7 +25,7 @@ class Graph {
             },
             // 縦ラベル
             vAxis: {
-                title: '温度',
+                title: '温度[℃]',
                 titleTextStyle: { italic: false },
                 viewWindow:{
                     max:35,

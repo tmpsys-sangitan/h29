@@ -44,9 +44,6 @@ function get_diary(date, jd) {
     // ディファードの宣言
     var df = new $.Deferred();
 
-    // URL生成
-    var url = '//tmpsys-sangitan.appspot.com/diary';
-
     // 日付が今日ならキャッシュしない
     var cachemode = true;
     var today = new Date();
@@ -63,7 +60,7 @@ function get_diary(date, jd) {
         dataType: 'jsonp',
         jsonpCallback: 'callback',
         type: 'GET',
-        url: url,
+        url: url + 'diary',
         data: {
             'date': formatDate(date, "YYYYMMDD000000")
         }
