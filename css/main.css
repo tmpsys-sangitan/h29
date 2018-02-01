@@ -137,15 +137,15 @@ body{
  * マップ
  */
 #mapField{
-    width: 760px;
+    width: 800px;
     margin: 20px auto;
     background-color: #ffffff;
 }
 
 #map{
-    width: 756px;
+    width: 800px;
     height: 252px;
-    margin: auto;
+    margin: 0px;
     border-spacing: 0;
 }
 

@@ -84,10 +84,11 @@
 				<td class="less"></td>
 				<td class="less"></td>
 				<td class="corr"></td>
+				<td class="less"></td>
 				<td class="snsr elec" rowspan="3">電子工作室</td>
 			</tr>
 		<tr>
-			<td class="corr" colspan="8"></td>
+			<td class="corr" colspan="9"></td>
 		</tr>
 			<tr>
 				<td class="snsr 3fsemi">3Fゼミ室</td>
@@ -95,6 +96,7 @@
 				<td class="snsr t2lab" colspan="2">実習室</td>
 				<td class="snsr img" colspan="2">画像処理室</td>
 				<td class="snsr t2cr">T2教室</td>
+				<td class="less"></td>
 			</tr>
 		</table>
 	</div>
@@ -102,6 +104,7 @@
 		2F
 		<table id="map">
 			<tr>
+				<td class="corr"></td>
 				<td class="less"></td>
 				<td class="corr"></td>
 				<td class="snsr s2lab" colspan="2">実習室</td>
@@ -112,9 +115,10 @@
 				<td rowspan="3">UNIX</td>
 			</tr>
 			<tr>
-				<td class="corr" colspan="8"></td>
+				<td class="corr" colspan="9"></td>
 			</tr>
 			<tr>
+				<td class="corr"></td>
 				<td class="snsr s1lab" colspan="2">実習室</td>
 				<td class="snsr s1cr">S1教室</td>
 				<td class="snsr t1cr">T1教室</td>
@@ -136,18 +140,19 @@
 				<td class="less"></td>
 				<td class="less"></td>
 				<td class="corr"></td>
+				<td class="less"></td>
 				<td class="less" rowspan="3"></td>
 			</tr>
 			<tr>
-				<td class="corr" colspan="8"></td>
+				<td class="corr" colspan="9"></td>
 			</tr>
 			<tr>
 				<td class="less"></td>
 				<td class="snsr 1ftr" colspan="2">職員室</td>
 				<td class="less"></td>
 				<td class="less"></td>
-				<td class="less"></td>
-				<td class="less"></td>
+				<td class="less" colspan="2"></td>
+				<td class="corr"></td>
 				<td class="less"></td>
 			</tr>
 		</table>
