@@ -10,11 +10,11 @@ NAME        :Hikaru Yoshida
 import cgi                                  # URLクエリ文の取得
 import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
-import urllib2                              # URLを開く
 import webapp2                              # App Engineのフレームワーク
 
 from py import diary                        # 日誌管理モジュール
 from py import graph                        # グラフデータモジュール
+from py import heatmap                      # マップデータモジュール
 from py import utility                      # 汎用関数
 
 # テンプレートファイルを読み込む環境を作成
@@ -116,6 +116,26 @@ class GetDiary(BaseHandler):
 
 
 
+class GetLatest(BaseHandler):
+    """最新温度データの送信
+    """
+
+    def get(self):
+        """ページ読み込み時処理
+        """
+        # パラメータ読み込み
+        mapid = cgi.escape(self.request.get("mapid"))
+
+        # JSONを返却
+        self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+        self.response.out.write(
+            "%s(%s)" %
+            ('callback',
+             heatmap.get_latest(mapid))
+        )
+
+
+
 # URL - 関数 対応
 app = webapp2.WSGIApplication([
     # ページ
@@ -127,4 +147,5 @@ app = webapp2.WSGIApplication([
 
     # GET
     webapp2.Route('/diary', GetDiary),
+    webapp2.Route('/latest', GetLatest),
 ])
