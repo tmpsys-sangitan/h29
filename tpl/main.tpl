@@ -48,7 +48,7 @@
 		</script>
 		<div id='graphOptionList'>
 			<div id='graphOption'>
-				日付:<input type="text" id="select_date" placeholder="2017/11/22"/>
+				日付:<input type="text" id="select_date" value="2017/11/22"/>
 			</div>
 			<div id='graphOption'>
 				期間:<select id="select_period"><option value="all">日間</option></select>
@@ -74,7 +74,7 @@
 
 	{# マップ #}
 	<div id="mapField">
-		3F
+		<h2>3F</h2>
 		<table id="map">
 			<tr>
 				<td class="snsr s2cr">S2教室</td>
@@ -101,7 +101,7 @@
 		</table>
 	</div>
 	<div id="mapField">
-		2F
+		<h2>2F</h2>
 		<table id="map">
 			<tr>
 				<td class="corr"></td>
@@ -129,7 +129,7 @@
 		</table>
 	</div>
 	<div id="mapField">
-		1F
+		<h2>1F</h2>
 		<table id="map">
 			<tr>
 				<td class="less"></td>

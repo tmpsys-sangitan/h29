@@ -141,37 +141,34 @@ body{
     margin: 20px auto;
     background-color: #ffffff;
 }
-
+#mapField h2{
+    margin: 0px 10px;
+}
 #map{
     width: 800px;
     height: 252px;
     margin: 0px;
     border-spacing: 0;
 }
-
 #map a{
     font-size: 14px;
     text-decoration: none;
     text-shadow: rgba(255,255,255,0.6) -1px 1px 0;
 }
-
 #map td{
     width: 80px;
     height: 80px;
     text-align: center;
     background-color: #eef2bf;
 }
-
 #map .corr{
     border: 1px solid #e5e5e5;
     background-color: #e5e5e5;
 }
-
 #map .snsr{
     border: 1px solid #fff;
     background-color: #eef2bf;
 }
-
 #map .less{
     border: 1px solid #fff;
     background-color: #888;
