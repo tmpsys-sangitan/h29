@@ -42,19 +42,22 @@
 		var j;
 
 		{# 日付選択イベント #}
-		$("#select_date").datepicker({
-			format      : 'yyyy/mm/dd',
-			language    : 'ja',
-			autoclose   : true,
-			clearBtn    : true,
-			clear       : '閉じる'
-			onSelect    : function(date){
-				{# 日付に変換 #}
-				var date = new Date(date);
-				j = null;
-				{# グラフの更新 #}
-				j = new Graph(mapid_list, date, "day");
-			}
+		$(function () {
+			$("#select_date").datepicker({
+				format      : 'yyyy/mm/dd',
+				language    : 'ja',
+				autoclose   : true,
+				clearBtn    : true,
+				clear       : '閉じる',
+				onSelect    : function(datetxt){
+					{# 日付に変換 #}
+					var date = new Date(datetxt);
+					j = null;
+					{# グラフの更新 #}
+					j = new Graph(mapid_list, date, "day");
+				}
+			});
+			$("#select_date").datepicker("setDate", "2017/11/22");
 		});
 
 		{# マップイベント #}
@@ -75,7 +78,7 @@
 		{# オプション #}
 		<div id='graphOptionList'>
 			<div id='graphOption'>
-				日付:<input type="text" id="select_date" value="2017/11/22"/>
+				日付:<input type="text" id="select_date"/>
 			</div>
 			<div id='graphOption'>
 				期間:<select id="select_period"><option value="all">日間</option></select>
@@ -182,7 +185,7 @@
 	{# What this? #}
 	<div id="content">
 		<h2>What this?</h2>
-		産業技術短期大学校の各教室に設置されたセンサーによって、収集された値をグラフやマップにして出力します。
+		茨城県立IT短大の各教室に設置されたセンサーによって収集した値を、グラフやマップで表示します。
 	</div>
 {% endblock %}
 
