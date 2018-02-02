@@ -11,6 +11,8 @@ class Graph {
      */
     constructor(mapid, startdate, period) {
 
+        $('#graphField').slideDown();
+
         // JSONデータの生成
         gen_jsondata(mapid, startdate, period);
 

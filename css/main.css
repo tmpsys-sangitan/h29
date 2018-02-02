@@ -114,6 +114,7 @@ body{
 #graphField{
     margin:0px;
     padding:0;
+    display:none;
     width:100%;
     height:480px;
     background-color: #ffffff;

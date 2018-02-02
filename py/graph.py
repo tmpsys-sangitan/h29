@@ -93,7 +93,7 @@ def gen_rows(date, devids=None):
     while time < dt.combine(date, datetime.time.max):
         # 横軸の入力
         new_line = [{
-            'v': utility.dt2date(time)
+            'v': utility.gen_jsdatatime(time)
         }]
 
         # 縦軸の入力

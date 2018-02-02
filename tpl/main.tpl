@@ -33,7 +33,34 @@
     <script type="text/javascript" src="./js/map.js"></script>
 	{# ページ固有設定 #}
 	<script>
+		{# 初期設定 #}
 		var url = '//tmpsys-sangitan.appspot.com/'
+		var mapid_list = [
+			"s2cr", "t1lab", "elec", "3fsemi", "net", "t2lab", "img", "t2cr",
+			"s2lab", "2ftr", "wslab", "s1lab", "s1cr", "t1cr", "2fsemi", "1ftr"
+		];
+		var j;
+
+		{# 日付選択イベント #}
+		$("#select_date").datepicker({
+			format      : 'yyyy/mm/dd',
+			language    : 'ja',
+			autoclose   : true,
+			clearBtn    : true,
+			clear       : '閉じる'
+			onSelect    : function(date){
+				{# 日付に変換 #}
+				var date = new Date(date);
+				j = null;
+				{# グラフの更新 #}
+				j = new Graph(mapid_list, date, "day");
+			}
+		});
+
+		{# マップイベント #}
+		$(function () {
+			HeatMap.getLatest('temp');
+		});
 	</script>
 {% endblock %}
 
@@ -45,13 +72,7 @@
 {# ページのコンテンツ #}
 {% block content %}
 	<div id="content">
-		{# 日付ピッカー #}
-		<script>
-			$(function () {
-				$.datepicker.setDefaults($.datepicker.regional["ja"]);
-				$("#select_date").datepicker();
-			});
-		</script>
+		{# オプション #}
 		<div id='graphOptionList'>
 			<div id='graphOption'>
 				日付:<input type="text" id="select_date" value="2017/11/22"/>
@@ -68,21 +89,10 @@
 		</div>
 		{# グラフ #}
 		<div id="graphField">Now Loading ...</div>
-		<script type="text/javascript">
-			var mapid_list = [
-				"s2cr", "t1lab", "elec", "3fsemi", "net", "t2lab", "img", "t2cr",
-				"s2lab", "2ftr", "wslab", "s1lab", "s1cr", "t1cr", "2fsemi", "1ftr"
-			]
-
-			var j = new Graph(mapid_list, "2017/11/22 00:00:00 +0900", "day");
-		</script>
 	</div>
 
 	{# マップ #}
 	<script>
-		$(function () {
-			HeatMap.getLatest('temp');
-		});
 	</script>
 	<div id="mapField">
 		<h2>3F</h2>

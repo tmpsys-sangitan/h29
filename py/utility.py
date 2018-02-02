@@ -22,12 +22,14 @@ def str2dt(string):
     except ValueError:
         return None
 
-def dt2date(date):
+def gen_jsdatatime(date):
     """ 日時型をDate(yyyy, mm, dd, HH, MM, SS)に変換する
         @string 日時文字列
     """
     try:
-        return date.strftime('Date(%Y, %m, %d, %H, %M, %S)')
+        jsmonth = str(date.month - 1)
+        jsdt = date.strftime('Date(%Y, ') + jsmonth + date.strftime(', %d, %H, %M, %S)')
+        return jsdt
     except ValueError:
         return None
 
