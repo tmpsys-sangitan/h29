@@ -24,48 +24,19 @@
 	{# jquery-ui-datepickerを読み込み #}
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1/i18n/jquery.ui.datepicker-ja.min.js"></script>
 	{# google chart toolsを読み込み #}
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	{# graph.jsを読み込み #}
     <script type="text/javascript" src="./js/graph.js"></script>
-	{# jsondata.jsを読み込み #}
-    <script type="text/javascript" src="./js/jsondata.js"></script>
 	{# map.jsを読み込み #}
     <script type="text/javascript" src="./js/map.js"></script>
 	{# ページ固有設定 #}
 	<script>
-		{# 初期設定 #}
 		var url = '//tmpsys-sangitan.appspot.com/'
-		var mapid_list = [
-			"s2cr", "t1lab", "elec", "3fsemi", "net", "t2lab", "img", "t2cr",
-			"s2lab", "2ftr", "wslab", "s1lab", "s1cr", "t1cr", "2fsemi", "1ftr"
-		];
-		var j;
 
-		{# 日付選択イベント #}
 		$(function () {
-			$('#graphInfo').hide()
-			$('#graphField').hide()
-
-			$("#select_date").datepicker({
-				format      : 'yyyy/mm/dd',
-				language    : 'ja',
-				autoclose   : true,
-				clearBtn    : true,
-				clear       : '閉じる',
-				onSelect    : function(datetxt){
-					{# 日付に変換 #}
-					var date = new Date(datetxt);
-					j = null;
-					{# グラフの更新 #}
-					j = new Graph(mapid_list, date, "day");
-				}
-			});
-			$("#select_date").datepicker("setDate", "2017/11/22");
-		});
-
-		{# マップイベント #}
-		$(function () {
-			HeatMap.getLatest('temp');
+			DatePicker.init('#select_date')
+			Graph.init('#graphField', '#graphInfo');
+			HeatMap.init();
 		});
 	</script>
 {% endblock %}

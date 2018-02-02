@@ -1,5 +1,9 @@
 var HeatMap = {
 
+    init: function(){
+        this.getLatest("temp")
+    },
+
     getLatest: function(sensor_type){
         /*
          * 最新温度データの取得
@@ -18,6 +22,9 @@ var HeatMap = {
             HeatMap.searchSensor(json);
         });
     },
+
+
+
     searchSensor: function(latest_json){
         /*
          * searchSensor .snsrクラスを検索して温度の表示と背景色の変更を行う
@@ -31,6 +38,8 @@ var HeatMap = {
         });
     },
 
+
+
     setNewlabel: function(id, temp){
         /*
          * setNewlabel 温度とラベルを表示
@@ -39,6 +48,8 @@ var HeatMap = {
          */
         $(id).html($(id).text() + "<br>" + temp + "℃");
     },
+
+
 
     setBGColor: function(id, temp){
         /*
@@ -51,11 +62,17 @@ var HeatMap = {
 }
 
 function hsv(h,s,v){
+    /*
+     * HSV色値をRGBカラーコードに変換する
+     */
     var f=h/60,i=f^0,m=v-v*s,k=v*s*(f-i),p=v-k,q=k+m;
     return '#'+c16([v,p,m,m,q,v][i]*255^0)+c16([q,v,v,p,m,m][i]*255^0)+c16([m,m,q,v,v,p][i]*255^0);
 }
 
 function c16( c10 ){
+    /*
+     * 10進数を16進数に変換する
+     */
     var c16 = '0'+c10.toString(16);
     return c16.substr(c16.length-2);
 }
