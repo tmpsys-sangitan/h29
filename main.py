@@ -40,6 +40,7 @@ class BaseHandler(webapp2.RequestHandler):
         values = values or {}
 
         # テンプレートを組み立ててレスポンスに書く
+        self.response.headers['cache-control'] = 'public, max-age=3600'
         self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
         tpl_file = ENV.get_template(tpl)
         self.response.write(tpl_file.render(values))
@@ -114,7 +115,8 @@ class GetDiary(BaseHandler):
             resjson = None
 
         if resjson is not None:
-            self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+            self.response.headers['cache-control'] = 'public, max-age=3600'
+            self.response.headers['content-type'] = 'application/javascript; charset=utf-8'
             self.response.out.write(
                 "%s(%s)" %
                 ('callback',
@@ -136,7 +138,8 @@ class GetLatest(BaseHandler):
         sensor_type = cgi.escape(self.request.get("type"))
 
         # JSONを返却
-        self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+        self.response.headers['cache-control'] = 'public, max-age=60'
+        self.response.headers['content-type'] = 'application/javascript; charset=utf-8'
         self.response.out.write(
             "%s(%s)" %
             ('callback',
