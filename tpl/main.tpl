@@ -16,9 +16,9 @@
 {# <head></head>内の記述 #}
 {% block lib %}
 	{{ super() }}
-	{# jqueryを読み込み #}
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-	{# jquery-uiを読み込み #}
+	{# jquery v3.3.1を読み込み #}
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	{# jquery-ui v1.12.1を読み込み #}
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
 	{# jquery-ui-datepickerを読み込み #}
@@ -33,7 +33,37 @@
     <script type="text/javascript" src="./js/map.js"></script>
 	{# ページ固有設定 #}
 	<script>
+		{# 初期設定 #}
 		var url = '//tmpsys-sangitan.appspot.com/'
+		var mapid_list = [
+			"s2cr", "t1lab", "elec", "3fsemi", "net", "t2lab", "img", "t2cr",
+			"s2lab", "2ftr", "wslab", "s1lab", "s1cr", "t1cr", "2fsemi", "1ftr"
+		];
+		var j;
+
+		{# 日付選択イベント #}
+		$(function () {
+			$("#select_date").datepicker({
+				format      : 'yyyy/mm/dd',
+				language    : 'ja',
+				autoclose   : true,
+				clearBtn    : true,
+				clear       : '閉じる',
+				onSelect    : function(datetxt){
+					{# 日付に変換 #}
+					var date = new Date(datetxt);
+					j = null;
+					{# グラフの更新 #}
+					j = new Graph(mapid_list, date, "day");
+				}
+			});
+			$("#select_date").datepicker("setDate", "2017/11/22");
+		});
+
+		{# マップイベント #}
+		$(function () {
+			HeatMap.getLatest('temp');
+		});
 	</script>
 {% endblock %}
 
@@ -45,16 +75,10 @@
 {# ページのコンテンツ #}
 {% block content %}
 	<div id="content">
-		{# 日付ピッカー #}
-		<script>
-			$(function () {
-				$.datepicker.setDefaults($.datepicker.regional["ja"]);
-				$("#select_date").datepicker();
-			});
-		</script>
+		{# オプション #}
 		<div id='graphOptionList'>
 			<div id='graphOption'>
-				日付:<input type="text" id="select_date" value="2017/11/22"/>
+				日付:<input type="text" id="select_date"/>
 			</div>
 			<div id='graphOption'>
 				期間:<select id="select_period"><option value="all">日間</option></select>
@@ -67,22 +91,12 @@
 			</div>
 		</div>
 		{# グラフ #}
+		<div id="graphInfo"></div>
 		<div id="graphField">Now Loading ...</div>
-		<script type="text/javascript">
-			var mapid_list = [
-				"s2cr", "t1lab", "elec", "3fsemi", "net", "t2lab", "img", "t2cr",
-				"s2lab", "2ftr", "wslab", "s1lab", "s1cr", "t1cr", "2fsemi", "1ftr"
-			]
-
-			var j = new Graph(mapid_list, "2017/11/22 00:00:00 +0900", "day");
-		</script>
 	</div>
 
 	{# マップ #}
 	<script>
-		$(function () {
-			HeatMap.getLatest('temp');
-		});
 	</script>
 	<div id="mapField">
 		<h2>3F</h2>
@@ -172,7 +186,7 @@
 	{# What this? #}
 	<div id="content">
 		<h2>What this?</h2>
-		産業技術短期大学校の各教室に設置されたセンサーによって、収集された値をグラフやマップにして出力します。
+		茨城県立IT短大の各教室に設置されたセンサーによって収集した値を、グラフやマップで表示します。
 	</div>
 {% endblock %}
 
