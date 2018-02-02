@@ -11,6 +11,7 @@ import cgi                                  # URLクエリ文の取得
 import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
 import webapp2                              # App Engineのフレームワーク
+import cloudstorage as storage              # GCS API
 
 from py import diary                        # 日誌管理モジュール
 from py import graph                        # グラフデータモジュール
@@ -107,12 +108,20 @@ class GetDiary(BaseHandler):
         # type  = cgi.escape(self.request.get("type"))
 
         # JSONを返却
-        self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
-        self.response.out.write(
-            "%s(%s)" %
-            ('callback',
-             graph.gen_dayly(date))
-        )
+        try:
+            resjson = graph.gen_dayly(date)
+        except storage.NotFoundError:
+            resjson = None
+
+        if resjson is not None:
+            self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+            self.response.out.write(
+                "%s(%s)" %
+                ('callback',
+                graph.gen_dayly(date))
+            )
+        else:
+            self.error(404)
 
 
 
