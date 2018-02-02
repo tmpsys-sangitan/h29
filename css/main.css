@@ -111,6 +111,10 @@ body{
 /*
  * グラフ
  */
+#graphInfo{
+    display:none;
+    background-color: #ffffff;
+}
 #graphField{
     margin:0px;
     padding:0;
