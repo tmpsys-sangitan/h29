@@ -22,7 +22,9 @@ def keycache(date, devid):
     """
     Memcacheキーの生成
     """
-    if isinstance(date, dt):
+    if date is None:
+        return "data_latest_" + devid
+    elif isinstance(date, dt):
         return "data_" + utility.d2str(date) + "_" + devid
     return "data_" + date + "_" + devid
 
@@ -137,6 +139,10 @@ def add(date, devid, intensity, voltage, val, digital):
     # キャッシュ更新
     memcache.delete(keycache(date, devid))
     memcache.add(keycache(date, devid), diary_json)
+
+    # 最新温度データ更新
+    memcache.delete(keycache(None, devid))
+    memcache.add(keycache(None, devid), new_data)
 
     # リクエストを作成
     payload = utility.dump_json({
