@@ -11,7 +11,8 @@ class Graph {
      */
     constructor(mapid, startdate, period) {
 
-        $('#graphField').slideDown();
+        $('#graphInfo').slideDown("slow");
+        $('#graphInfo').text("Now Loading ...");
 
         // JSONデータの生成
         gen_jsondata(mapid, startdate, period);
@@ -34,6 +35,8 @@ class Graph {
                     min:0
                 }
             },
+            height: 480,
+            width:960,
             // カーソルを合わせた時の表示
             crosshair: { trigger: 'both' },
             // カーソルを合わせた時に同じ縦軸のデータをまとめて表示
@@ -54,8 +57,13 @@ class Graph {
      * グラフの再描画
      */
     draw() {
+        $('#graphInfo').hide();
+        $('#graphInfo').text("");
+        $('#graphField').show();
+
         var json = _jsondata;
         var datatable = new google.visualization.DataTable(json);
         this.chart.draw(datatable, this.options);
+
     }
 }

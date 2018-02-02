@@ -43,6 +43,9 @@
 
 		{# 日付選択イベント #}
 		$(function () {
+			$('#graphInfo').hide()
+			$('#graphField').hide()
+
 			$("#select_date").datepicker({
 				format      : 'yyyy/mm/dd',
 				language    : 'ja',
@@ -92,7 +95,7 @@
 		</div>
 		{# グラフ #}
 		<div id="graphInfo"></div>
-		<div id="graphField">Now Loading ...</div>
+		<div id="graphField"></div>
 	</div>
 
 	{# マップ #}
