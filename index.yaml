@@ -1,0 +1,14 @@
+#
+# FILE        :index.yaml
+# DATE        :2018.02.05
+# DESCRIPTION :データストア 複合インデックス設定
+# NAME        :Hikaru Yoshida
+#
+
+indexes:
+
+# 種類Sensor をsensor_typeとtagで検索
+# - kind: Sensor
+#   properties:
+#   - name: sensor_type
+#   - name: tag
