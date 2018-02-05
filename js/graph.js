@@ -14,36 +14,55 @@ var formatDate = function (date, format) {
     return format;
 };
 
-var DatePicker = {
-    init: function(pickid){
-        $(pickid).datepicker({
-            format      : 'yyyy/mm/dd',
-            language    : 'ja',
-            autoclose   : true,
-            clearBtn    : true,
-            clear       : '閉じる',
-            onSelect    : function(datetxt){
-                Graph.chgStatus(new Date(datetxt), "day");
-            }
-        });
-        $(pickid).datepicker("setDate", "2017/11/22");
-    }
+var GraphChg = function ($) {
+    Graph.chgStatus(DatePicker.get(), "day", SelectLocation.get(), "temp");
 }
 
+var DatePicker = {
+    id: null,
+    init: function (id) {
+        this.id = id;
+
+        $(this.id).datepicker({
+            format: 'yyyy/mm/dd',
+            language: 'ja',
+            autoclose: true,
+            clearBtn: true,
+            clear: '閉じる',
+            onSelect: GraphChg
+        });
+        $(this.id).datepicker("setDate", "2017/11/22");
+    },
+    get: function () {
+        return $(this.id).datepicker("getDate");
+    }
+};
+
+var SelectLocation = {
+    id: null,
+    init: function (id) {
+        this.id = id;
+        $(this.id).change(GraphChg);
+    },
+    get: function () {
+        return $(this.id).val();
+    }
+};
+
 var InfoBoard = {
-    load: function(id){
+    load: function (id) {
         $(id).slideDown("slow");
         $(id).text("Now Loading ...");
     },
-    error: function(id, msg){
+    error: function (id, msg) {
         $(id).slideDown("slow");
         $(id).text("Error: " + msg);
     },
-    close: function(id){
+    close: function (id) {
         $(id).slideUp("slow");
         $(id).text("");
     },
-}
+};
 
 var Graph = {
     // グラフ 要素ID
@@ -53,7 +72,7 @@ var Graph = {
     // 情報欄 要素ID
     infoid: null,
     // グラフ 開始日
-    startdate: null,
+    date: null,
     // グラフ 周期
     period: null,
     // グラフ JSONデータ
@@ -71,13 +90,13 @@ var Graph = {
         vAxis: {
             title: '温度[℃]',
             titleTextStyle: { italic: false },
-            viewWindow:{
-                max:35,
-                min:0,
+            viewWindow: {
+                max: 35,
+                min: 0,
             }
         },
         height: 480,
-        width:960,
+        width: 960,
         // カーソルを合わせた時の表示
         crosshair: { trigger: 'both', orientation: 'vertical' },
         // カーソルを合わせた時に同じ縦軸のデータをまとめて表示
@@ -86,13 +105,13 @@ var Graph = {
         legend: {
             position: 'top',
             maxLines: 2,
-            textStyle: {color: 'royalblue', fontSize: 10.5}
+            textStyle: { color: 'royalblue', fontSize: 10.5 }
         }
     },
 
 
 
-    init: function(graphid, infoid){
+    init: function (graphid, infoid) {
         /*
          * グラフの初期設定
          * graphid: グラフの要素ID
@@ -110,15 +129,15 @@ var Graph = {
 
 
 
-    initGoogle: function(){
+    initGoogle: function () {
         /*
          * Google Chart Toolsの初期設定
          */
 
         // Google Chart Tools API 読込
         var gct_def = new $.Deferred();
-        google.charts.load('current', {'packages':['corechart']});
-        google.charts.setOnLoadCallback(function(){
+        google.charts.load('current', { 'packages': ['corechart'] });
+        google.charts.setOnLoadCallback(function () {
             gct_def.resolve();
         });
         return gct_def.promise();
@@ -126,17 +145,25 @@ var Graph = {
 
 
 
-    chgStatus: function(startdate, period){
+    chgStatus: function (startdate, period, tag, type) {
         /*
          * グラフの設定変更
+         * @startdate Datatime型 開始日
+         * @type      String型   センサ種類
+         * @tag       String型   絞り込みタグ
+         * @period    String型   表示期間
          */
 
         // グラフの更新が必要かどうかを判定する
-        if(this.startdate == startdate && this.period == period){
+        if (this.startdate == startdate && this.period == period
+            && this.type == type && this.tag == tag) {
+
             return;
         }
         this.startdate = startdate;
         this.period = period;
+        this.type = type;
+        this.tag = tag;
 
         // ロード開始
         InfoBoard.load(this.infoid);
@@ -144,10 +171,10 @@ var Graph = {
         console.time('graph: load time');
 
         // グラフのデータを取得
-        $.when(
-            this.getJSON(new Date(startdate))
-        ).then(function () {
-            // 取得が完了したら
+        var dt = this.getJSON(new Date(startdate));
+
+        // 取得が完了したら
+        $.when(dt).then(function () {
             console.timeEnd('graph: load time');
             // グラフの描画
             console.time('graph: draw time');
@@ -156,12 +183,12 @@ var Graph = {
 
             // ロード終了
             console.timeEnd('graph: total time');
-        })
+        });
     },
 
 
 
-    getJSON: function(date) {
+    getJSON: function (getdate) {
         /*
          * 日誌の読み込み
          * @date Datatime型 日付
@@ -170,11 +197,20 @@ var Graph = {
         // 日付が今日ならキャッシュしない
         var cachemode = true;
         var today = new Date();
-        if (date.getFullYear() == today.getFullYear()
-            && date.getMonth() == today.getMonth()
-            && date.getDate() == today.getDate()) {
+        if (getdate.getFullYear() == today.getFullYear()
+            && getdate.getMonth() == today.getMonth()
+            && getdate.getDate() == today.getDate()) {
 
             cachemode = false;
+        }
+
+        var datas = {
+            'date': formatDate(getdate, "YYYYMMDD000000"),
+            'type': this.type,
+            'tag': this.tag
+        };
+        if (this.tag === "none") {
+            delete datas.tag;
         }
 
         // 読み込み
@@ -184,9 +220,7 @@ var Graph = {
             jsonpCallback: 'callback',
             type: 'GET',
             url: url + 'diary',
-            data: {
-                'date': formatDate(date, "YYYYMMDD000000")
-            }
+            data: datas
         }).done(function (json) {
             // JSONを格納
             Graph.json = json;
@@ -195,7 +229,7 @@ var Graph = {
 
 
 
-    draw: function(){
+    draw: function () {
         /*
          * グラフの描画・再描画
          * startdate : 開始日
@@ -206,8 +240,8 @@ var Graph = {
 
 
         var datatable = new google.visualization.DataTable(this.json);
-        var formatter = new google.visualization.DateFormat({pattern: "y/M/d HH:mm"});
+        var formatter = new google.visualization.DateFormat({ pattern: "y/M/d HH:mm" });
         formatter.format(datatable, 0);
         this.chart.draw(datatable, this.options);
     },
-}
+};
