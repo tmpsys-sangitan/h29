@@ -106,8 +106,9 @@ class GetDiary(BaseHandler):
         # パラメータ読み込み
         date = cgi.escape(self.request.get("date"))
         tag = cgi.escape(self.request.get("tag"))
-        # sensor_type  = cgi.escape(self.request.get("type"))
-        sensor_type  = "temp"
+        sensor_type = cgi.escape(self.request.get("type"))
+        if tag == '':
+            tag = None
 
         # JSONを返却
         try:
