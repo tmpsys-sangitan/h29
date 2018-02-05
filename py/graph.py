@@ -17,11 +17,12 @@ from py import utility              # 汎用関数
 
 
 
-def gen_dayly(date):
+def gen_dayly(date, sensor_type, tag):
     """日間グラフを描画するJSONを生成する
 
     Arguments:
         date {[datatime]} -- 日付を指定
+        tag {[string]} -- 場所を指定
 
     Returns:
         json -- 日間グラフ描画用のjsonを発行
@@ -29,8 +30,8 @@ def gen_dayly(date):
 
     # JSONの生成
     graph_json = {
-        "cols": gen_cols(sensor.get_list_label("temp")),
-        "rows": gen_rows(utility.str2dt(date), sensor.get_list_devid("temp"))
+        "cols": gen_cols(sensor.get_list_label(sensor_type, tag)),
+        "rows": gen_rows(utility.str2dt(date), sensor.get_list_devid(sensor_type, tag))
     }
 
     # 出力
@@ -66,7 +67,7 @@ def gen_cols(labels):
 
 
 
-def gen_rows(date, devids=None):
+def gen_rows(date, devids):
     """グラフを描画するJSONの1日分のボディを生成する
 
     Arguments:
@@ -78,6 +79,7 @@ def gen_rows(date, devids=None):
     Returns:
         dicstionary list -- 1日分のボディ部分の辞書リスト
     """
+
     # 空のボディを作成
     rows = []
     rows_append = rows.append # 参照を事前に読み込むことで高速化

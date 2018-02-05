@@ -21,25 +21,33 @@ class Sensor(ndb.Model):
 
     # センサ種類
     sensor_type = ndb.StringProperty()
+    tags = ndb.StringProperty(repeated=True)
 
 
 
-def get_list(sensor_type):
+def get_list(sensor_type, tag=None):
     """ 指定された種類のセンサのリストを返す
 
     Arguments:
-        sensor_type  {string} -- 種類
+        sensor_type {string} -- 種類
+        tag {string} -- タグによる絞り込み
 
     Returns:
         list -- マップID、機器ID、表示名のリスト
     """
     # キャッシュからリストの取得
-    sensor_json = memcache.get("sensor_" + sensor_type)
+    if tag != None:
+        sensor_json = memcache.get("sensor_" + sensor_type + "_" + tag)
+    else:
+        sensor_json = memcache.get("sensor_" + sensor_type)
 
     # キャッシュ ミス
     if sensor_json is None:
         # データストアからリストの取得
-        sensor_keys = Sensor.query(Sensor.sensor_type == sensor_type).fetch(keys_only=True)
+        sensor_query = Sensor.query().filter(Sensor.sensor_type == sensor_type)
+        if tag != None:
+            sensor_query = sensor_query.filter(Sensor.tags == tag)
+        sensor_keys = sensor_query.fetch(keys_only=True)
 
         # 辞書の生成
         sensor_list = []
@@ -67,17 +75,18 @@ def get_list(sensor_type):
 
 
 
-def get_list_mapid(sensor_type):
+def get_list_mapid(sensor_type, tag=None):
     """指定された種類のマップIDのリストを返す
 
     Arguments:
         sensor_type  {string} -- 種類
+        tag {string} -- タグによる絞り込み
 
     Returns:
         string -- マップID
     """
     # センサID辞書の取得
-    sensor_list = get_list(sensor_type)
+    sensor_list = get_list(sensor_type, tag)
 
     # リストの検索
     results = [x['mapid'] for x in sensor_list]
@@ -86,17 +95,18 @@ def get_list_mapid(sensor_type):
 
 
 
-def get_list_devid(sensor_type):
+def get_list_devid(sensor_type, tag=None):
     """指定された種類の機器IDのリストを返す
 
     Arguments:
         sensor_type  {string} -- 種類
+        tag {string} -- タグによる絞り込み
 
     Returns:
         string -- 機器ID
     """
     # センサID辞書の取得
-    sensor_list = get_list(sensor_type)
+    sensor_list = get_list(sensor_type, tag)
 
     # リストの検索
     results = [x['devid'] for x in sensor_list]
@@ -105,14 +115,15 @@ def get_list_devid(sensor_type):
 
 
 
-def get_list_label(sensor_type):
+def get_list_label(sensor_type, tag=None):
     """表示名のリストを返す
 
     Returns:
         string -- 表示名のリスト
+        tag {string} -- タグによる絞り込み
     """
     # センサID辞書の取得
-    sensor_list = get_list(sensor_type)
+    sensor_list = get_list(sensor_type, tag)
 
     # リストの検索
     results = [x['label'] for x in sensor_list]

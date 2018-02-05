@@ -40,7 +40,8 @@ class BaseHandler(webapp2.RequestHandler):
         values = values or {}
 
         # テンプレートを組み立ててレスポンスに書く
-        self.response.headers['Content-Type'] = 'text/html; charset=utf-8'
+        self.response.headers['cache-control'] = 'public, max-age=3600'
+        self.response.headers['content-type'] = 'text/html; charset=utf-8'
         tpl_file = ENV.get_template(tpl)
         self.response.write(tpl_file.render(values))
 
@@ -104,21 +105,24 @@ class GetDiary(BaseHandler):
         """
         # パラメータ読み込み
         date = cgi.escape(self.request.get("date"))
-        # mapid = cgi.escape(self.request.get("mapid"))
-        # type  = cgi.escape(self.request.get("type"))
+        tag = cgi.escape(self.request.get("tag"))
+        sensor_type = cgi.escape(self.request.get("type"))
+        if tag == '':
+            tag = None
 
         # JSONを返却
         try:
-            resjson = graph.gen_dayly(date)
+            resjson = graph.gen_dayly(date, sensor_type, tag)
         except storage.NotFoundError:
             resjson = None
 
         if resjson is not None:
-            self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+            self.response.headers['cache-control'] = 'public, max-age=3600'
+            self.response.headers['content-type'] = 'application/javascript; charset=utf-8'
             self.response.out.write(
                 "%s(%s)" %
                 ('callback',
-                graph.gen_dayly(date))
+                resjson)
             )
         else:
             self.error(404)
@@ -136,7 +140,8 @@ class GetLatest(BaseHandler):
         sensor_type = cgi.escape(self.request.get("type"))
 
         # JSONを返却
-        self.response.headers['Content-Type'] = 'application/javascript; charset=utf-8'
+        self.response.headers['cache-control'] = 'public, max-age=60'
+        self.response.headers['content-type'] = 'application/javascript; charset=utf-8'
         self.response.out.write(
             "%s(%s)" %
             ('callback',
