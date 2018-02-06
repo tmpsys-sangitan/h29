@@ -36,7 +36,7 @@ class BaseHandler(webapp2.RequestHandler):
             tpl {[string]} -- ベースになるhtml/tplファイル名
             values {[dictionary]} -- 入力するパラメータ
         """
-        # valseに指定がないなら空辞書を生成
+        # valuesに指定がないなら空辞書を生成
         values = values or {}
 
         # テンプレートを組み立ててレスポンスに書く
@@ -54,7 +54,15 @@ class MainPage(BaseHandler):
     def get(self):
         """ページ読み込み時処理
         """
-        self.render('tpl/main.tpl')
+
+        # リストの値を用意
+        values = {
+            'periods': graph.Periods.get(),
+            'tags'   : graph.Tags.get(),
+            'types'  : graph.Types.get(),
+        }
+
+        self.render('tpl/main.html', values)
 
 
 
@@ -65,7 +73,7 @@ class PostUpload(BaseHandler):
     def get(self):
         """ページ読み込み時処理
         """
-        self.render('tpl/upload.tpl')
+        self.render('tpl/upload.html')
 
     def post(self):
         """送信時処理
