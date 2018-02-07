@@ -12,6 +12,7 @@ from datetime import timedelta      # 相対時間型
 from google.appengine.api import memcache   # Memcache API
 from google.appengine.ext import ndb        # Datastore API
 import datetime  # datatime
+import logging                              # ログ出力
 
 from py import diary                # 日誌管理モジュール
 from py import sensor               # センサ管理
@@ -132,6 +133,7 @@ class Datastore(ndb.Model):
         if res is None:
             res = cls.edit_datastore(cls.get_datastore())
             cls.set_cache(res)
+            res = cls.get_cache()
         return res
 
     @classmethod
@@ -168,10 +170,15 @@ class Datastore(ndb.Model):
         res = []
         append = res.append   # 参照を事前に読み込むことで高速化
         for key in keys:
-            append({
-                "value" : key.string_id().split("_")[0],
-                "name" : key.string_id().split("_")[1]
-            })
+            try:
+                append({
+                    "value" : key.string_id().split("_")[0],
+                    "name" : key.string_id().split("_")[1]
+                })
+            except UnicodeDecodeError:
+                import traceback
+                logging.warning("DATASTORE EDIT_DATASTORE : UnicodeDecodeError")
+                logging.warning(traceback.format_exc())
         return res
 
 
