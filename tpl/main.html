@@ -58,7 +58,9 @@
 			<div id='graphOption'>
 				期間:
 				<select id="select_period">
-					<option value="day">日間</option>
+					{% for period in periods %}
+						<option value="{{ period.value }}">{{ period.name }}</option>
+					{% endfor %}
 				</select>
 			</div>
 			<div id='graphOption'>
@@ -72,7 +74,9 @@
 			<div id='graphOption'>
 				種類:
 				<select id="select_type">
-					<option value="temp">温度</option>
+					{% for type in types %}
+						<option value="{{ type.value }}">{{ type.name }}</option>
+					{% endfor %}
 				</select>
 			</div>
 		</div>
