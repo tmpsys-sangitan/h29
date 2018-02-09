@@ -7,11 +7,12 @@ DESCRIPTION :メインプログラム
 NAME        :Hikaru Yoshida
 """
 
+from datetime import datetime as dt         # datatime型
 import cgi                                  # URLクエリ文の取得
+import cloudstorage as storage              # GCS API
 import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
 import webapp2                              # App Engineのフレームワーク
-import cloudstorage as storage              # GCS API
 
 from py import diary                        # 日誌管理モジュール
 from py import graph                        # グラフデータモジュール
@@ -81,14 +82,19 @@ class PostUpload(BaseHandler):
 
         # パラメータ読み込み
         devid = cgi.escape(self.request.get("devid"))
-        date = cgi.escape(self.request.get("date"))
+        datestr = cgi.escape(self.request.get("date"))
         intensity = cgi.escape(self.request.get("fi"))
         voltage = cgi.escape(self.request.get("bv"))
         val = cgi.escape(self.request.get("val"))
         digital = cgi.escape(self.request.get("ad"))
 
+        # 日時の変換に失敗したら、現在日時を代入する
+        date = utility.str2dt(datestr)
+        if date is None:
+            date = dt.now()
+
         # 日誌に仮追加
-        diary.add(utility.str2dt(date), devid, intensity, voltage, val, digital)
+        diary.add(date, devid, intensity, voltage, val, digital)
 
 
 
