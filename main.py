@@ -8,6 +8,7 @@ NAME        :Hikaru Yoshida
 """
 
 from datetime import datetime as dt         # datatime型
+from datetime import timedelta      # 相対時間型
 import cgi                                  # URLクエリ文の取得
 import cloudstorage as storage              # GCS API
 import jinja2                               # ページの描画
@@ -91,7 +92,8 @@ class PostUpload(BaseHandler):
         # 日時の変換に失敗したら、現在日時を代入する
         date = utility.str2dt(datestr)
         if date is None:
-            date = dt.now()
+            # 世界標準時 + 9時間 ＝ 日本標準時
+            date = dt.now() + timedelta(hours=9)
 
         # 日誌に仮追加
         diary.add(date, devid, intensity, voltage, val, digital)
