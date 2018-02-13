@@ -96,7 +96,7 @@ var Graph = {
             }
         },
         height: 480,
-        width: 960,
+        width: 800,
         // カーソルを合わせた時の表示
         crosshair: { trigger: 'both', orientation: 'vertical' },
         // カーソルを合わせた時に同じ縦軸のデータをまとめて表示
