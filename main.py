@@ -7,11 +7,13 @@ DESCRIPTION :メインプログラム
 NAME        :Hikaru Yoshida
 """
 
+from datetime import datetime as dt         # datatime型
+from datetime import timedelta      # 相対時間型
 import cgi                                  # URLクエリ文の取得
+import cloudstorage as storage              # GCS API
 import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
 import webapp2                              # App Engineのフレームワーク
-import cloudstorage as storage              # GCS API
 
 from py import diary                        # 日誌管理モジュール
 from py import graph                        # グラフデータモジュール
@@ -36,7 +38,7 @@ class BaseHandler(webapp2.RequestHandler):
             tpl {[string]} -- ベースになるhtml/tplファイル名
             values {[dictionary]} -- 入力するパラメータ
         """
-        # valseに指定がないなら空辞書を生成
+        # valuesに指定がないなら空辞書を生成
         values = values or {}
 
         # テンプレートを組み立ててレスポンスに書く
@@ -54,7 +56,15 @@ class MainPage(BaseHandler):
     def get(self):
         """ページ読み込み時処理
         """
-        self.render('tpl/main.tpl')
+
+        # リストの値を用意
+        values = {
+            'periods': graph.Periods.get(),
+            'tags'   : graph.Tags.get(),
+            'types'  : graph.Types.get(),
+        }
+
+        self.render('tpl/main.html', values)
 
 
 
@@ -65,7 +75,7 @@ class PostUpload(BaseHandler):
     def get(self):
         """ページ読み込み時処理
         """
-        self.render('tpl/upload.tpl')
+        self.render('tpl/upload.html')
 
     def post(self):
         """送信時処理
@@ -73,14 +83,20 @@ class PostUpload(BaseHandler):
 
         # パラメータ読み込み
         devid = cgi.escape(self.request.get("devid"))
-        date = cgi.escape(self.request.get("date"))
+        datestr = cgi.escape(self.request.get("date"))
         intensity = cgi.escape(self.request.get("fi"))
         voltage = cgi.escape(self.request.get("bv"))
         val = cgi.escape(self.request.get("val"))
         digital = cgi.escape(self.request.get("ad"))
 
+        # 日時の変換に失敗したら、現在日時を代入する
+        date = utility.str2dt(datestr)
+        if date is None:
+            # 世界標準時 + 9時間 ＝ 日本標準時
+            date = dt.now() + timedelta(hours=9)
+
         # 日誌に仮追加
-        diary.add(utility.str2dt(date), devid, intensity, voltage, val, digital)
+        diary.add(date, devid, intensity, voltage, val, digital)
 
 
 

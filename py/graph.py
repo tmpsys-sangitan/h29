@@ -7,14 +7,16 @@
 # NAME        :Hikaru Yoshida
 '''
 
-from datetime import datetime as dt # datatime型
+from datetime import datetime as dt  # datatime型
 from datetime import timedelta      # 相対時間型
-import datetime # datatime
+from google.appengine.api import memcache   # Memcache API
+from google.appengine.ext import ndb        # Datastore API
+import datetime  # datatime
+import logging                              # ログ出力
 
 from py import diary                # 日誌管理モジュール
 from py import sensor               # センサ管理
 from py import utility              # 汎用関数
-
 
 
 def gen_dayly(date, sensor_type, tag):
@@ -36,7 +38,6 @@ def gen_dayly(date, sensor_type, tag):
 
     # 出力
     return utility.dump_json(graph_json)
-
 
 
 def gen_cols(labels):
@@ -66,7 +67,6 @@ def gen_cols(labels):
     return cols
 
 
-
 def gen_rows(date, devids):
     """グラフを描画するJSONの1日分のボディを生成する
 
@@ -82,11 +82,11 @@ def gen_rows(date, devids):
 
     # 空のボディを作成
     rows = []
-    rows_append = rows.append # 参照を事前に読み込むことで高速化
+    rows_append = rows.append  # 参照を事前に読み込むことで高速化
 
     # 必要な日誌を読み込みリストに登録
     open_diarys = []
-    diarys_append = open_diarys.append # 参照を事前に読み込むことで高速化
+    diarys_append = open_diarys.append  # 参照を事前に読み込むことで高速化
     for devid in devids:
         diarys_append(utility.load_json(diary.read(date, devid)))
 
@@ -115,3 +115,100 @@ def gen_rows(date, devids):
 
     # 生成したボディを返す
     return rows
+
+
+
+class Datastore(ndb.Model):
+    """[summary]
+    """
+
+    # Memcacheでのキー名
+    cache_name = ""
+
+    @classmethod
+    def get(cls):
+        """ データの取得
+        """
+        res = cls.get_cache()
+        if res is None:
+            res = cls.edit_datastore(cls.get_datastore())
+            cls.set_cache(res)
+            res = cls.get_cache()
+        return res
+
+    @classmethod
+    def set_cache(cls, data):
+        memcache.add(cls.cache_name, utility.dump_json(data))
+
+    @classmethod
+    def get_cache(cls):
+        """ キャッシュからデータを取得
+
+        Returns:
+            listdic -- データ
+        """
+        # キャッシュからタグ一覧を取得
+        data = memcache.get(cls.cache_name)
+
+        # ヒットしたら変換
+        if data is not None:
+            data = utility.load_json(data, charset="ascii")
+
+        return data
+
+    @classmethod
+    def get_datastore(cls):
+        """ データストアからデータを取得
+
+        Returns:
+            listdic -- データ
+        """
+        return cls.query().fetch(keys_only=True)
+
+    @classmethod
+    def edit_datastore(cls, keys):
+        res = []
+        append = res.append   # 参照を事前に読み込むことで高速化
+        for key in keys:
+            try:
+                append({
+                    "value" : key.string_id().split("_")[0],
+                    "name" : key.string_id().split("_")[1]
+                })
+            except UnicodeDecodeError:
+                import traceback
+                logging.warning("DATASTORE EDIT_DATASTORE : UnicodeDecodeError")
+                logging.warning(traceback.format_exc())
+        return res
+
+
+
+class Periods(Datastore):
+    """ Datastore 期間のデータ
+    """
+
+    # Memcacheでのキー名
+    cache_name = "option_periods"
+
+
+class Tags(Datastore):
+    """ Datastore タグのデータ
+    """
+
+    # Memcacheでのキー名
+    cache_name = "option_tags"
+
+class Types(Datastore):
+    """ Datastore 種類のデータ
+    """
+
+    # Memcacheでのキー名
+    cache_name = "option_types"
+
+def gen_taglist():
+    """ 指定された種類のセンサのリストを返す
+
+    Returns:
+        list -- tag、表示名のリスト
+    """
+    return Tags.get()
