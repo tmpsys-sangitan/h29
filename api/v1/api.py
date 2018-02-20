@@ -58,8 +58,7 @@ def getGraph(handler, date, tag, kind):
         handler.response.headers['content-type'] = 'application/javascript; charset=utf-8'
         handler.response.out.write(
             "%s(%s)" %
-            ('callback',
-            resjson)
+            ('callback', resjson)
         )
     else:
         handler.error(404)
@@ -71,7 +70,5 @@ def getLatest(handler, kind):
     handler.response.headers['content-type'] = 'application/javascript; charset=utf-8'
     handler.response.out.write(
         "%s(%s)" %
-        ('callback',
-            diary.Latest(kind).get())
+        ('callback', utility.dump_json(diary.Latest(kind).get()))
     )
-

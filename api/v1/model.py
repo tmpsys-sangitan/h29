@@ -80,6 +80,11 @@ class Cache:
         raise NotImplementedError
 
     def get(self):
+        """ キャッシュからJSONを読み込む
+
+        Returns:
+            dictionary -- 読み込んだ辞書
+        """
         data = memcache.get(self.get_cache_name())
         if data is not None:
             data = utility.load_json(data, charset="ascii")
@@ -88,6 +93,11 @@ class Cache:
         return data
 
     def set(self, data):
+        """ 辞書型をJSONに変換し、キャッシュに保存する
+
+        Arguments:
+            data {dictionary} -- 保存したい辞書
+        """
         if not memcache.set(self.get_cache_name(), utility.dump_json(data)):
             logging.error(self.get_cache_name() + " Memcache set failed")
 
