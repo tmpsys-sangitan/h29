@@ -79,15 +79,16 @@ class diary(model.Storage):
 
     @classmethod
     def set_cache(cls, date, devid, data):
-        memcache.add(cls.keycache(date, devid), data)
+        memcache.add(cls.keycache(date, devid), utility.dump_json(data))
 
     @classmethod
     def get_cache(cls, date, devid):
-        return memcache.get(cls.keycache(date, devid))
+        res = memcache.get(cls.keycache(date, devid))
+        return utility.load_json(res, charset="ascii") if res is not None else None
 
     @classmethod
     def set_storage(cls, date, data):
-        model.Storage.write_file(cls.keystr(date), data, "application/json")
+        model.Storage.write_file(cls.keystr(date), utility.dump_json(data), "application/json")
 
     @classmethod
     def get_storage(cls, date):
