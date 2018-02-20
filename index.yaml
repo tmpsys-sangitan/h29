@@ -7,8 +7,8 @@
 
 indexes:
 
-# 種類Sensor をsensor_typeとtagで検索
+# 種類Sensor をkindとtagで検索
 # - kind: Sensor
 #   properties:
-#   - name: sensor_type
+#   - name: kind
 #   - name: tag
