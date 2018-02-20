@@ -17,25 +17,10 @@ threadsafe: true
 # URLと挙動
 handlers:
 
-# favicon.icoの参照とアップロード
-- url: /favicon.ico
-  static_files: img/favicon.ico
-  upload: img/favicon.ico
-
-# img/*.pngの参照とアップロード
-- url: /img/(.*\.png)
-  static_files: img/\1
-  upload: img/(.*\.png)
-
-# js/*.jsの参照とアップロード
-- url: /js/(.*\.js)
-  static_files: js/\1
-  upload: js/(.*\.js)
-
-# css/*.cssの参照とアップロード
-- url: /css/(.*\.css)
-  static_files: css/\1
-  upload: css/(.*\.css)
+# staticの参照とアップロード
+- url: /static/(.*\.(css|ico|js))$
+  static_files: static/\1
+  upload: static/(.*\.(css|ico|js))$
 
 # その他はmain.appを実行
 - url: /.*

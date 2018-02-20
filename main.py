@@ -15,10 +15,7 @@ import jinja2                               # ページの描画
 import os                                   # OSインターフェイス
 import webapp2                              # App Engineのフレームワーク
 
-from py import diary                        # 日誌管理モジュール
-from py import graph                        # グラフデータモジュール
-from py import heatmap                      # マップデータモジュール
-from py import utility                      # 汎用関数
+from api.v1 import api                      # バックエンドプログラム
 
 # テンプレートファイルを読み込む環境を作成
 ENV = jinja2.Environment(
@@ -57,14 +54,14 @@ class MainPage(BaseHandler):
         """ページ読み込み時処理
         """
 
-        # リストの値を用意
+        # リストの値を取得
         values = {
-            'periods': graph.Periods.get(),
-            'tags'   : graph.Tags.get(),
-            'types'  : graph.Types.get(),
+            'periods': api.getPeriods(),
+            'tags'   : api.getTags(),
+            'kinds'  : api.getKinds(),
         }
 
-        self.render('tpl/main.html', values)
+        self.render('template/main.html', values)
 
 
 
@@ -75,30 +72,60 @@ class PostUpload(BaseHandler):
     def get(self):
         """ページ読み込み時処理
         """
-        self.render('tpl/upload.html')
+        self.render('template/upload.html')
 
     def post(self):
         """送信時処理
         """
 
         # パラメータ読み込み
-        devid = cgi.escape(self.request.get("devid"))
         datestr = cgi.escape(self.request.get("date"))
-        intensity = cgi.escape(self.request.get("fi"))
-        voltage = cgi.escape(self.request.get("bv"))
-        val = cgi.escape(self.request.get("val"))
-        digital = cgi.escape(self.request.get("ad"))
+        devid = cgi.escape(self.request.get("devid"))
 
-        # 日時の変換に失敗したら、現在日時を代入する
-        date = utility.str2dt(datestr)
-        if date is None:
-            # 世界標準時 + 9時間 ＝ 日本標準時
-            date = dt.now() + timedelta(hours=9)
+        # データ辞書作成
+        data = {}
+        try:
+            data['i'] = int(self.request.get("i"))
+        except ValueError:
+            pass
+        try:
+            data['v'] = int(self.request.get("v"))
+        except ValueError:
+            pass
+        try:
+            data['p1'] = round(float(self.request.get("p1")), 1)
+        except ValueError:
+            pass
+        try:
+            data['p2'] = round(float(self.request.get("p2")), 1)
+        except ValueError:
+            pass
+        try:
+            data['p3'] = round(float(self.request.get("p3")), 1)
+        except ValueError:
+            pass
+        try:
+            data['p4'] = round(float(self.request.get("p4")), 1)
+        except ValueError:
+            pass
+        try:
+            data['a1'] = int(self.request.get("a1"))
+        except ValueError:
+            pass
+        try:
+            data['a2'] = int(self.request.get("a2"))
+        except ValueError:
+            pass
+        try:
+            data['a3'] = int(self.request.get("a3"))
+        except ValueError:
+            pass
+        try:
+            data['a4'] = int(self.request.get("a4"))
+        except ValueError:
+            pass
 
-        # 日誌に仮追加
-        diary.add(date, devid, intensity, voltage, val, digital)
-
-
+        api.addDiary(datestr, devid, data)
 
 class PostWrite(BaseHandler):
     """仮追加を確定し、Storageに書込む
@@ -108,7 +135,7 @@ class PostWrite(BaseHandler):
     def get(cls):
         """ページ読み込み時処理
         """
-        diary.write()
+        api.updateDiary()
 
 
 
@@ -122,26 +149,9 @@ class GetDiary(BaseHandler):
         # パラメータ読み込み
         date = cgi.escape(self.request.get("date"))
         tag = cgi.escape(self.request.get("tag"))
-        sensor_type = cgi.escape(self.request.get("type"))
-        if tag == '':
-            tag = None
+        kind = cgi.escape(self.request.get("kind"))
 
-        # JSONを返却
-        try:
-            resjson = graph.gen_dayly(date, sensor_type, tag)
-        except storage.NotFoundError:
-            resjson = None
-
-        if resjson is not None:
-            self.response.headers['cache-control'] = 'public, max-age=3600'
-            self.response.headers['content-type'] = 'application/javascript; charset=utf-8'
-            self.response.out.write(
-                "%s(%s)" %
-                ('callback',
-                resjson)
-            )
-        else:
-            self.error(404)
+        api.getGraph(self, date, tag, kind)
 
 
 
@@ -153,17 +163,8 @@ class GetLatest(BaseHandler):
         """ページ読み込み時処理
         """
         # パラメータ読み込み
-        sensor_type = cgi.escape(self.request.get("type"))
-
-        # JSONを返却
-        self.response.headers['cache-control'] = 'public, max-age=60'
-        self.response.headers['content-type'] = 'application/javascript; charset=utf-8'
-        self.response.out.write(
-            "%s(%s)" %
-            ('callback',
-             heatmap.get_latest(sensor_type))
-        )
-
+        kind = cgi.escape(self.request.get("kind"))
+        api.getLatest(self, kind)
 
 
 # URL - 関数 対応

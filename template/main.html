@@ -6,7 +6,7 @@
 #}
 
 {# ベーステンプレートを継承 #}
-{% extends "tpl/base.html" %}
+{% extends "template/base.html" %}
 
 {# <title></title>内の記述 #}
 {% block title %} トップページ {% endblock %}
@@ -24,9 +24,9 @@
 	{# google chart toolsを読み込み #}
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	{# graph.jsを読み込み #}
-	<script type="text/javascript" src="./js/graph.js"></script>
+	<script type="text/javascript" src="./static/graph.js"></script>
 	{# map.jsを読み込み #}
-	<script type="text/javascript" src="./js/map.js"></script>
+	<script type="text/javascript" src="./static/map.js"></script>
 	{# ページ固有設定 #}
 	<script>
 		var url = '//tmpsys-sangitan.appspot.com/'
@@ -74,8 +74,8 @@
 			<div id='graphOption'>
 				種類:
 				<select id="select_type">
-					{% for type in types %}
-						<option value="{{ type.value }}">{{ type.name }}</option>
+					{% for kind in kinds %}
+						<option value="{{ kind.value }}">{{ kind.name }}</option>
 					{% endfor %}
 				</select>
 			</div>
