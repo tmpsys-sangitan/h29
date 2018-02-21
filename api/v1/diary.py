@@ -74,8 +74,7 @@ class diary(model.Storage):
                 res = cls.get_cache(date, devid)
             except storage.errors.NotFoundError:
                 logging.debug(cls.keystr(date) + "MISS")
-                res = {}
-        return res
+        return res or {} # res、resがNoneなら空辞書を返す
 
     @classmethod
     def set_cache(cls, date, devid, data):
