@@ -31,7 +31,7 @@ var DatePicker = {
             clear: '閉じる',
             onSelect: GraphChg
         });
-        $(this.id).datepicker("setDate", "2017/11/22");
+        $(this.id).datepicker("setDate", formatDate(new Date(), "YYYY/MM/DD"));
     },
     get: function () {
         return $(this.id).datepicker("getDate");
