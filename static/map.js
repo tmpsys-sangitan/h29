@@ -33,8 +33,10 @@ var HeatMap = {
 
         jQuery('.snsr').each(function(){
             var temp = latest_json[$(this).attr('class').split(' ')[1]]
-            HeatMap.setNewlabel(this, temp);
-            HeatMap.setBGColor(this, temp);
+            if (temp != null) {
+                HeatMap.setNewlabel(this, temp);
+                HeatMap.setBGColor(this, temp);
+            }
         });
     },
 
