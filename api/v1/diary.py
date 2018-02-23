@@ -40,12 +40,13 @@ class diary(model.Storage):
         new_time = utility.t2str(date)
         if devid not in diary_dic:
             diary_dic[devid] = {}
-        diary_dic[devid][new_time] = data
-        diary_json = utility.dump_json(diary_dic)
+        diary_dic[new_time] = data
+        # diary_json = utility.dump_json(diary_dic)
 
         # キャッシュ更新
-        memcache.delete(diary.keycache(date, devid))
-        memcache.add(diary.keycache(date, devid), diary_json)
+        # memcache.delete(diary.keycache(date, devid))
+        # memcache.add(diary.keycache(date, devid), diary_json)
+        cls.set_cache(date, devid, diary_dic)
 
         # 最新温度データ更新
         Latest.updateLatest(devid, data)
@@ -78,7 +79,7 @@ class diary(model.Storage):
 
     @classmethod
     def set_cache(cls, date, devid, data):
-        memcache.add(cls.keycache(date, devid), utility.dump_json(data))
+        memcache.set(cls.keycache(date, devid), utility.dump_json(data))
 
     @classmethod
     def get_cache(cls, date, devid):
