@@ -18,7 +18,7 @@ threadsafe: true
 handlers:
 
 # staticの参照とアップロード
-- url: /static/(.*\.(css|ico|js))$
+- url: /(.*\.(css|ico|js))$
   static_files: static/\1
   upload: static/(.*\.(css|ico|js))$
 
@@ -36,3 +36,9 @@ libraries:
 # Google App Engine API
 - name: webapp2
   version: latest
+
+automatic_scaling:
+  min_idle_instances: automatic
+  max_idle_instances: 1
+  min_pending_latency: 30ms
+  max_pending_latency: automatic
