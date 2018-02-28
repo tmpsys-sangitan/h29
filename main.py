@@ -150,6 +150,8 @@ class GetDiary(BaseHandler):
         date = cgi.escape(self.request.get("date"))
         tag = cgi.escape(self.request.get("tag"))
         kind = cgi.escape(self.request.get("kind"))
+        if tag == "all":
+            tag = None
 
         api.getGraph(self, date, tag, kind)
 
