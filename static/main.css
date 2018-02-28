@@ -169,7 +169,7 @@ body{
 }
 #map .less{
     border: 1px solid #fff;
-    background-color: #888;
+    background-color: #ccc;
     -ms-user-select: none;
     -webkit-user-select: none;
     user-select: none;
