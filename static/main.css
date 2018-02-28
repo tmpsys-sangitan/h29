@@ -160,19 +160,12 @@ body{
     background-color: #eef2bf;
 }
 #map .corr{
-    border: 1px solid #e5e5e5;
-    background-color: #e5e5e5;
+    border: 1px solid #ccc;
+    background-color: #ccc;
 }
 #map .snsr{
     border: 1px solid #fff;
     background-color: #eef2bf;
-}
-#map .less{
-    border: 1px solid #fff;
-    background-color: #ccc;
-    -ms-user-select: none;
-    -webkit-user-select: none;
-    user-select: none;
 }
 
 
