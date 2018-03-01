@@ -83,6 +83,7 @@ var Graph = {
         chartArea: { 'width': '90%', 'height': '75%' },
         // 横ラベル
         hAxis: {
+            format: 'HH:mm',
             title: '時間',
             titleTextStyle: { italic: false },
         },
@@ -105,7 +106,7 @@ var Graph = {
         legend: {
             position: 'top',
             maxLines: 2,
-            textStyle: { color: 'royalblue', fontSize: 10.5 }
+            textStyle: { color: 'royalblue', fontSize: 14 }
         }
     },
 
