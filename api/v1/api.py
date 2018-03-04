@@ -48,14 +48,14 @@ def updateDiary():
     """
     diary.Diary(dt.now()).storage.write()
 
-def getGraph(handler, date, tag, kind):
+def getGraph(handler, date, period, tag, kind):
     """ グラフを返す
     """
     if tag == '':
             tag = None
 
     # JSONを返却
-    resjson = graph.gen_dayly(date, tag, kind)
+    resjson = graph.Graph(date, period, tag, kind).get()
 
     if resjson is not None:
         handler.response.headers['cache-control'] = 'public, max-age=3600'
