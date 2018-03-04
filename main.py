@@ -16,6 +16,7 @@ import os                                   # OSインターフェイス
 import webapp2                              # App Engineのフレームワーク
 
 from api.v1 import api                      # バックエンドプログラム
+from api.v1 import utility                  # 汎用
 
 # テンプレートファイルを読み込む環境を作成
 ENV = jinja2.Environment(
@@ -147,13 +148,17 @@ class GetDiary(BaseHandler):
         """ページ読み込み時処理
         """
         # パラメータ読み込み
-        date = cgi.escape(self.request.get("date"))
+        date = utility.str2dt(cgi.escape(self.request.get("date")))
+        try:
+            period = int(cgi.escape(self.request.get("period")))
+        except ValueError:
+            period = 1
         tag = cgi.escape(self.request.get("tag"))
         kind = cgi.escape(self.request.get("kind"))
         if tag == "all":
             tag = None
 
-        api.getGraph(self, date, tag, kind)
+        api.getGraph(self, date, period, tag, kind)
 
 
 
