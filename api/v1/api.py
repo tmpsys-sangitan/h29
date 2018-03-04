@@ -17,17 +17,17 @@ import utility  # 汎用関数
 def getPeriods():
     """ 期間一覧
     """
-    return graph.Periods.get()
+    return graph.Periods().get()
 
 def getTags():
     """ タグ一覧
     """
-    return graph.Tags.get()
+    return graph.Tags().get()
 
 def getKinds():
     """ データ種類一覧
     """
-    return graph.Kinds.get()
+    return graph.Kinds().get()
 
 def addDiary(datestr, devid, data):
     """ データの追加
@@ -37,12 +37,12 @@ def addDiary(datestr, devid, data):
     if date is None:
         # 世界標準時 + 9時間 ＝ 日本標準時
         date = dt.now() + timedelta(hours=9)
-    diary.diary.add(date, devid, data)
+    diary.Diary(date).add(date, devid, data)
 
 def updateDiary():
     """ 日誌の更新
     """
-    diary.diary.write()
+    diary.Diary(dt.now()).storage.write()
 
 def getGraph(handler, date, tag, kind):
     """ グラフを返す

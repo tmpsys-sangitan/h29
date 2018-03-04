@@ -88,7 +88,7 @@ def gen_rows(date, tag, kind):
     open_diarys = []
     diarys_append = open_diarys.append  # 参照を事前に読み込むことで高速化
     for devid in sensor.get_list_devid(tag):
-        jsondata = diary.diary.get(date, devid)
+        jsondata = diary.Diary(date).get(date, devid)
         diarys_append(jsondata)
 
     # 引数の日付の00:00~23:59まで1分間隔
@@ -125,39 +125,28 @@ def gen_rows(date, tag, kind):
 
 
 class Periods(model.Datastore):
-    """ Datastore 期間のデータ
+    """ 期間
     """
 
-    @classmethod
-    def get_cache_name(cls):
-        """ Memcacheでのキー名
+    def __init__(self):
+        """ 初期化
         """
-        return "option_periods"
+        super(Periods, self).__init__("option_periods")
 
 class Tags(model.Datastore):
-    """ Datastore タグのデータ
+    """ タグ
     """
 
-    @classmethod
-    def get_cache_name(cls):
-        """ Memcacheでのキー名
+    def __init__(self):
+        """ 初期化
         """
-        return "option_tags"
+        super(Tags, self).__init__("option_tags")
 
 class Kinds(model.Datastore):
-    """ Datastore 種類のデータ
+    """ データ種類
     """
 
-    @classmethod
-    def get_cache_name(cls):
-        """ Memcacheでのキー名
+    def __init__(self):
+        """ 初期化
         """
-        return "option_types"
-
-def gen_taglist():
-    """ 指定された種類のセンサのリストを返す
-
-    Returns:
-        list -- tag、表示名のリスト
-    """
-    return Tags.get()
+        super(Kinds, self).__init__("option_types")
