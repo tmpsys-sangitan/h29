@@ -14,59 +14,39 @@ import logging                              # ログ出力
 import model                        # データモデル
 import utility                      # 汎用関数
 
-
-
-class Sensor(ndb.Model):
-    """ Datastore 種類のデータ
+class Sensor(model.Datastore):
+    """ センサーリスト
     """
-
     # センサ種類
     tags = ndb.StringProperty(repeated=True)
 
     def __init__(self, tag=None):
+        """ タグの指定
+
+        Keyword Arguments:
+            tag {string} -- 絞り込み用のタグを指定 (default: None)
+        """
+        if tag is not None:
+            super(Sensor, self).__init__("sensor_" + tag)
+        else:
+            super(Sensor, self).__init__("sensor")
         self.tag = tag
 
-    def get_cache_name(self):
-        """ Memcacheでのキー名
-        """
-        if self.tag != None:
-            return "sensor_" + self.tag
-        return "sensor"
-
-    def get(self):
-        """ データの取得
-        """
-        res = self.get_cache()
-        if res is None:
-            logging.debug(self.get_cache_name() + "MISS")
-            res = self.edit_datastore(self.get_datastore())
-            self.set_cache(res)
-            res = self.get_cache()
-        return res
-
-    def set_cache(self, data):
-        """ キャッシュへデータを格納
-        """
-        memcache.add(self.get_cache_name(), utility.dump_json(data))
-
-    def get_cache(self):
-        """ キャッシュからデータを取得
-        """
-        data = memcache.get(self.get_cache_name())
-        if data is not None:
-            data = utility.load_json(data, charset="ascii")
-        return data
-
-    def get_datastore(self):
+    def read(self):
         """ データストアからデータを取得
-            @tag    タグによる絞り込み
+
+        Arguments:
+            tag {[type]} -- タグによる絞り込み
+
+        Returns:
+            string list -- 取得したキーのリスト
         """
         sensor_query = Sensor.query()
         if self.tag != None:
             sensor_query = sensor_query.filter(Sensor.tags == self.tag)
         return sensor_query.fetch(keys_only=True)
 
-    def edit_datastore(self, keys):
+    def edit(self, keys):
         """ データストアから取得したデータをJSONに変換する
             @keys   データストアから取得したデータ
         """

@@ -14,54 +14,72 @@ import cloudstorage as storage                  # Cloud Storage API
 import logging                                  # ログ出力
 import os                                       # OS
 
-import utility              # 汎用関数
+import utility                                  # 汎用関数
+
+class Cache(object):
+    """ Memcacheの汎用モデル
+    """
+
+    def __init__(self, name, charset='ascii'):
+        """ キャッシュの実体化
+
+        Arguments:
+            name {string} -- Memcacheのキー
+        """
+        self.name = name
+        self.charset = charset
+
+    def get(self):
+        """ キャッシュからJSONを読み込む
+
+        Returns:
+            dictionary -- 読み込んだ辞書
+        """
+        data = memcache.get(self.name)
+        if data is not None:
+            data = utility.load_json(data, charset=self.charset)
+        else:
+            data = {}
+        return data
+
+    def add(self, data):
+        """ 辞書型をJSONに変換し、キャッシュに保存する
+
+        Arguments:
+            data {dictionary} -- 保存したい辞書
+        """
+        if not memcache.set(self.name, utility.dump_json(data)):
+            logging.error(self.name + " Memcache set failed")
+
 
 class Datastore(ndb.Model):
     """ データストアの汎用モデル
     """
 
-    @classmethod
-    def get_cache_name(cls):
-        """ Memcacheでのキー名
-        """
-        raise NotImplementedError
+    def __init__(self, name):
+        """ キャッシュ名の指定
 
-    @classmethod
-    def get(cls):
-        """ データの取得
+        Arguments:
+            name {string} -- Memcacheのキー
         """
-        res = cls.get_cache()
-        if res is None:
-            logging.debug(cls.get_cache_name() + "MISS")
-            res = cls.edit_datastore(cls.get_datastore())
-            cls.set_cache(res)
-            res = cls.get_cache()
-        return res
+        self.cache = Cache(name, charset='unicode')
 
-    @classmethod
-    def set_cache(cls, data):
-        """ キャッシュへデータを格納
-        """
-        memcache.add(cls.get_cache_name(), utility.dump_json(data))
-
-    @classmethod
-    def get_cache(cls):
-        """ キャッシュからデータを取得
-        """
-        data = memcache.get(cls.get_cache_name())
-        if data is not None:
-            data = utility.load_json(data, charset="ascii")
-        return data
-
-    @classmethod
-    def get_datastore(cls):
+    def read(self):
         """ データストアからデータを取得
-        """
-        return cls.query().fetch(keys_only=True)
 
-    @classmethod
-    def edit_datastore(cls, keys):
-        """ データストアから取得したデータをJSONに変換する
+        Returns:
+            string list -- 取得したキーのリスト
+        """
+        return self.query().fetch(keys_only=True)
+
+    def edit(self, keys):
+        """ データストアから取得したデータを辞書型に変換する
+
+        Arguments:
+            keys {string list} -- 取得したキーのリスト
+
+        Returns:
+            dictionary -- 編集済みの辞書
         """
         res = []
         append = res.append   # 参照を事前に読み込むことで高速化
@@ -72,34 +90,16 @@ class Datastore(ndb.Model):
             })
         return res
 
-class Cache:
-
-    def get_cache_name(self):
-        """ Memcacheでのキー名
-        """
-        raise NotImplementedError
-
     def get(self):
-        """ キャッシュからJSONを読み込む
-
-        Returns:
-            dictionary -- 読み込んだ辞書
+        """ データの取得
         """
-        data = memcache.get(self.get_cache_name())
-        if data is not None:
-            data = utility.load_json(data, charset="ascii")
-        else:
-            data = {}
-        return data
+        res = self.cache.get()
+        if not bool(res):
+            logging.debug(self.cache.name + "MISS")
+            self.cache.add(self.edit(self.read()))
+            res = self.cache.get()
+        return res
 
-    def set(self, data):
-        """ 辞書型をJSONに変換し、キャッシュに保存する
-
-        Arguments:
-            data {dictionary} -- 保存したい辞書
-        """
-        if not memcache.set(self.get_cache_name(), utility.dump_json(data)):
-            logging.error(self.get_cache_name() + " Memcache set failed")
 
 # GCSタイムアウト設定
 RETRY_PARAMS = storage.RetryParams(
@@ -110,36 +110,8 @@ RETRY_PARAMS = storage.RetryParams(
 storage.set_default_retry_params(RETRY_PARAMS)
 
 class Storage:
-
-    @classmethod
-    def get(cls):
-        """ データの取得
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def set_cache(cls, data):
-        """ キャッシュへデータを格納
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def get_cache(cls):
-        """ キャッシュからデータを取得
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def get_storage(cls):
-        """ ストレージからデータを取得
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def edit_storage(cls, datas):
-        """ ストレージから取得したデータをJSONに変換する
-        """
-        raise NotImplementedError
+    """ Google Cloud Storageの汎用モデル
+    """
 
     @staticmethod
     def get_bucket_name():
