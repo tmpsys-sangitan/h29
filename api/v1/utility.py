@@ -62,16 +62,16 @@ def t2str(date):
         return None
 
 def ascii_encode_dict(data):
-    """ jsonがunicodeにcastされないようにする
+    """ jsonがunicode(u'unicode型')にcastされないようにする
         例: json.load(f, object_hook=ascii_encode_dict)
     """
     ascii_encode = lambda x: x.encode('ascii') if isinstance(x, unicode) else x
     return dict(map(ascii_encode, pair) for pair in data.items())
 
-def load_json(jsondata, charset="unicode"):
+def load_json(jsondata, charset="ascii"):
     """ JSONの読み込み
     """
-    if charset == "unicode":
+    if charset == "ascii":
         return json.loads(jsondata, object_hook=ascii_encode_dict)
     else:
         return json.loads(jsondata)
