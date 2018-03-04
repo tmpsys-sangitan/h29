@@ -9,6 +9,7 @@ NAME        :Hikaru Yoshida
 
 from datetime import datetime as dt         # datatime型
 from datetime import timedelta      # 相対時間型
+import logging                              # ログ出力
 
 import graph    # グラフデータモジュール
 import diary    # 日誌管理モジュール
@@ -29,7 +30,7 @@ def getKinds():
     """
     return graph.Kinds().get()
 
-def addDiary(datestr, devid, data):
+def addDiary(handler, datestr, devid, data):
     """ データの追加
     """
     # 日時の変換に失敗したら、現在日時を代入する
@@ -37,7 +38,10 @@ def addDiary(datestr, devid, data):
     if date is None:
         # 世界標準時 + 9時間 ＝ 日本標準時
         date = dt.now() + timedelta(hours=9)
-    diary.Diary(date).add(date, devid, data)
+    try:
+        diary.Diary(date).add(date, devid, data)
+    except RuntimeError as error:
+        logging.warning(error.message)
 
 def updateDiary():
     """ 日誌の更新

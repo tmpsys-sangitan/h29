@@ -125,7 +125,7 @@ class PostUpload(BaseHandler):
         except ValueError:
             pass
 
-        api.addDiary(datestr, devid, data)
+        api.addDiary(self, datestr, devid, data)
 
 class PostWrite(BaseHandler):
     """仮追加を確定し、Storageに書込む
