@@ -38,8 +38,10 @@ class Cache(object):
         data = memcache.get(self.name)
         if data is not None:
             data = utility.load_json(data, charset=self.charset)
+            logging.debug("Cache.get() : hit %s", self.name)
         else:
             data = {}
+            logging.debug("Cache.get() : miss %s", self.name)
         return data
 
     def add(self, data):
@@ -50,6 +52,8 @@ class Cache(object):
         """
         if not memcache.set(self.name, utility.dump_json(data)):
             logging.error(self.name + " Memcache set failed")
+        else:
+            logging.debug("Cache.add() : set %s", self.name)
 
 
 class Datastore(ndb.Model):
