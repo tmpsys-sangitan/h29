@@ -94,18 +94,17 @@ class GraphRows(object):
         """ タグからキャッシュ名を生成する
 
         Arguments:
-            date {[type]} -- [description]
+            date {string} -- [description]
             tag  {string} -- タグ
             kind {[type]} -- [description]
         """
         self.date = date
         self.tag = tag
         self.kind = kind
-        if date != dt.now() + timedelta(hours=9):
-            if tag is not None:
-                self.cache = model.Cache('_'.join(["graph_rows", utility.d2str(date), tag, kind]))
-            else:
-                self.cache = model.Cache('_'.join(["graph_rows", utility.d2str(date), '_', kind]))
+        if tag is None:
+            tag = '_'
+        time = 60 if utility.d2str(date) == utility.d2str(dt.now()) else 0
+        self.cache = model.Cache('_'.join(["graph_rows", utility.d2str(date), tag, kind]), time=time)
 
     def edit(self):
         """グラフを描画するJSONの1日分のボディを生成する
