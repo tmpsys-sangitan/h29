@@ -38,7 +38,13 @@ libraries:
   version: latest
 
 automatic_scaling:
-  min_idle_instances: automatic
+  # 補欠インスタンス数
+  min_idle_instances: 1
+  # 待機インスタンス数
   max_idle_instances: 1
+  # インスタンス生成までの待機時間下限
   min_pending_latency: 30ms
-  max_pending_latency: automatic
+  # インスタンス生成までの待機時間上限
+  max_pending_latency: 30ms
+  # 1インスタンスあたりの処理量設定
+  max_concurrent_requests: 4
