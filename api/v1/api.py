@@ -46,7 +46,7 @@ def addDiary(handler, datestr, devid, data):
 def updateDiary():
     """ 日誌の更新
     """
-    diary.Diary(dt.now()).storage.write()
+    diary.Diary.updateDiary()
 
 def getGraph(handler, date, period, tag, kind):
     """ グラフを返す
