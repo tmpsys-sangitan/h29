@@ -103,7 +103,8 @@ class Diary(object):
                 # 作業用辞書に読込済みか確認
                 if date not in wip_diary:
                     wip_tasks[date] = []
-                    wip_diary[date] = DiaryStorage(date).read()
+                    wip_diary[date] = DiaryStorage(date)
+                    wip_diary[date].read()
 
                 # taskの紐づけ
                 wip_tasks[date].append(task)
@@ -167,7 +168,7 @@ class DiaryStorage(object):
         """ ストレージの初期化
 
         Arguments:
-            date {datetime} -- 日付
+            date {datetime or string} -- 日付
         """
         self.name = "data_" + utility.d2str(date) + ".json"
         self.dic = {}
@@ -262,7 +263,7 @@ class RequestQueue(object):
             string     -- 時刻
             dictionary -- データ
         """
-        pl = utility.load_json(task)
+        pl = utility.load_json(task.payload)
         return pl['date'], pl['devid'], pl['time'], pl['data']
 
 

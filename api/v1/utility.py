@@ -17,49 +17,64 @@ def str2dt(string):
     """ yyyymmddHHMMSS(20180118113940)を日時型に変換する
         @string 日時文字列
     """
-    try:
-        return dt.strptime(string, '%Y%m%d%H%M%S')
-    except ValueError:
-        return None
+    if isinstance(string,basestring):
+        try:
+            return dt.strptime(string, '%Y%m%d%H%M%S')
+        except ValueError:
+            return None
+    else:
+        return string
 
 def gen_jsdatatime(date):
     """ 日時型をDate(yyyy, mm, dd, HH, MM, SS)に変換する
         @string 日時文字列
     """
-    try:
-        jsmonth = str(date.month - 1)
-        jsdt = date.strftime('Date(%Y, ') + jsmonth + date.strftime(', %d, %H, %M, %S)')
-        return jsdt
-    except ValueError:
-        return None
+    if isinstance(date,dt):
+        try:
+            jsmonth = str(date.month - 1)
+            jsdt = date.strftime('Date(%Y, ') + jsmonth + date.strftime(', %d, %H, %M, %S)')
+            return jsdt
+        except ValueError:
+            return None
+    else:
+        return date
 
 def dt2str(date):
     """ 日時型をyyyy/mm/dd HH:MM:SS +TIMEZONE
         (2018/01/18 11:39:40 +0900)に変換する
         @string 日時文字列
     """
-    try:
-        return date.strftime('%Y/%m/%d %H:%M:%S') + " +0900"
-    except ValueError:
-        return None
+    if isinstance(date,dt):
+        try:
+            return date.strftime('%Y/%m/%d %H:%M:%S') + " +0900"
+        except ValueError:
+            return None
+    else:
+        return date
 
 def d2str(date):
     """ 日時型をyyyymmdd(20180118)に変換する
         @string 日時文字列
     """
-    try:
-        return date.strftime('%Y%m%d')
-    except ValueError:
-        return None
+    if isinstance(date,dt):
+        try:
+            return date.strftime('%Y%m%d')
+        except ValueError:
+            return None
+    else:
+        return date
 
 def t2str(date):
     """ 日時型をHHMM(1139)に変換する
         @string 日時文字列
     """
-    try:
-        return date.strftime('%H%M')
-    except ValueError:
-        return None
+    if isinstance(date,dt):
+        try:
+            return date.strftime('%H%M')
+        except ValueError:
+            return None
+    else:
+        return date
 
 def ascii_encode_dict(data):
     """ jsonがunicode(u'unicode型')にcastされないようにする
