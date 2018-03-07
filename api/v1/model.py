@@ -20,14 +20,16 @@ class Cache(object):
     """ Memcacheの汎用モデル
     """
 
-    def __init__(self, name, charset='ascii'):
+    def __init__(self, name, charset='ascii', time=0):
         """ キャッシュの実体化
 
         Arguments:
             name {string} -- Memcacheのキー
+            time {int}    -- キャッシュの有効期限[s]
         """
         self.name = name
         self.charset = charset
+        self.time = time
 
     def get(self):
         """ キャッシュからJSONを読み込む
@@ -50,7 +52,7 @@ class Cache(object):
         Arguments:
             data {dictionary} -- 保存したい辞書
         """
-        if not memcache.set(self.name, utility.dump_json(data)):
+        if not memcache.set(self.name, utility.dump_json(data), self.time):
             logging.error(self.name + " Memcache set failed")
         else:
             logging.debug("Cache.add() : set %s", self.name)
