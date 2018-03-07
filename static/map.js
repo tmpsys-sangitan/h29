@@ -54,7 +54,7 @@ var HeatMap = {
          * id : 変更する要素
          * temp : 温度
          */
-        $(id).html($(id).text() + "<br>" + temp + "℃");
+        $(id).html($(id).text() + "<br><span style=\"font-weight: bold;\">" + temp + "℃</span>");
     },
 
 
