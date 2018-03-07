@@ -140,6 +140,7 @@ body{
     background-color: #ffffff;
 }
 #mapField h2{
+    display: inline;
     margin: 0px 10px;
 }
 #map{
