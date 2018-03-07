@@ -47,7 +47,10 @@ class Diary(object):
             devid {string}     -- 機器ID
             data  {dictionary} -- 保存するパラメータの辞書
         """
-        self.cache[devid].add(date, data)
+        if devid in self.cache:
+            self.cache[devid].add(date, data)
+        else:
+            pass # 新たなセンサを検知
         Latest.updateLatest(devid, data)
         RequestQueue().add(date, devid, data)
 
