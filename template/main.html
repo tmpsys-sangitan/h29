@@ -29,12 +29,13 @@
 	<script type="text/javascript" src="./map.js"></script>
 	{# ページ固有設定 #}
 	<script>
-		var url = '//tmpsys-sangitan.appspot.com/'
+		var url = '//tmpsys-sangitan.appspot.com/';
 
 		$(function () {
 			DatePicker.init('#select_date');
 			SelectLocation.init('#select_loc');
 			Graph.init('#graphField', '#graphInfo');
+			Clock.get('.clock');
 			HeatMap.init();
 		});
 	</script>
@@ -89,7 +90,7 @@
 	<script>
 	</script>
 	<div id="mapField">
-		<h2>短大棟 3F</h2>
+		<h2>短大棟 3F</h2> <span class="clock"></span>
 		<table id="map">
 			<tr>
 				<td class="snsr s2cr">S2教室</td>

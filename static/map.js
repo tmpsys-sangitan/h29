@@ -1,3 +1,9 @@
+var Clock = {
+    get: function(id){
+        $(id).text(formatDate(new Date(), "YYYY/MM/DD hh:mm:ss"));
+    }
+};
+
 var HeatMap = {
 
     init: function(){
