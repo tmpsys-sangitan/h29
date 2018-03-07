@@ -108,10 +108,8 @@ class GraphRows(object):
 
     def edit(self):
         """グラフを描画するJSONの1日分のボディを生成する
-
         Arguments:
             date {[datatime]} -- 日付
-
         Returns:
             dicstionary list -- 1日分のボディ部分の辞書リスト
         """
@@ -121,15 +119,11 @@ class GraphRows(object):
         rows_append = rows.append  # 参照を事前に読み込むことで高速化
 
         # 必要な日誌を読み込みリストに登録
-        open_diarys = []
-        diarys_append = open_diarys.append  # 参照を事前に読み込むことで高速化
-        for devid in sensor.get_list_devid(self.tag):
-            jsondata = diary.Diary(self.date).get(self.date, devid)
-            diarys_append(jsondata)
+        open_diarys = [diary.Diary(self.date).get(self.date, devid) for devid in sensor.get_list_devid(self.tag)]
 
         # 引数の日付の00:00~23:59まで1分間隔
-        time = dt.combine(self.date, datetime.time.min)
-        while time < dt.combine(self.date, datetime.time.max):
+        start = dt.combine(self.date, datetime.time.min)
+        for time in (start + datetime.timedelta(minutes=x) for x in range(1440)):
             # 横軸の入力
             new_line = [{
                 'v': utility.gen_jsdatatime(time)
@@ -137,10 +131,11 @@ class GraphRows(object):
 
             # 縦軸の入力
             new_line_append = new_line.append  # 参照を事前に読み込むことで高速化
+            timestr = utility.t2str(time)
             for open_diary in open_diarys:
                 try:
                     new_line_append({
-                        'v': open_diary[utility.t2str(time)][self.kind]
+                        'v': open_diary[timestr][self.kind]
                     })
                 except KeyError:
                     new_line_append({
@@ -151,9 +146,6 @@ class GraphRows(object):
             rows_append({
                 'c': new_line
             })
-
-            # 1分進める
-            time = time + timedelta(minutes=1)
 
         # 生成したボディを返す
         return rows
